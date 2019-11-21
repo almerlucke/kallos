@@ -42,16 +42,16 @@ func (s *Section) Stream() *Stream {
 	for !s.Until.ShouldStop(stream) {
 		var event StreamEvent
 
-		duration := s.Rhythm.Value()
+		duration := s.Rhythm.GenerateValue() * s.Clock
 
 		if duration < 0 {
 			// Pause
 			event = NewPause(-duration)
 		} else if duration > 0 {
 			// Note
-			pitch := s.Pitch.Value()
-			velocity := s.Velocity.Value()
-			channel := s.Channel.Value()
+			pitch := s.Pitch.GenerateValue()
+			velocity := s.Velocity.GenerateValue()
+			channel := s.Channel.GenerateValue()
 
 			event = NewNote(duration, pitch, velocity, channel)
 		}
