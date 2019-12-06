@@ -33,6 +33,8 @@ func TestCore(t *testing.T) {
 
 	stream := s.Stream()
 
+	t.Logf("event num %v\n", len(stream.Events))
+
 	for _, e := range stream.Events {
 		t.Logf("event %v", e)
 	}

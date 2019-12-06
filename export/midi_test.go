@@ -125,7 +125,11 @@ func TestExportMidi(t *testing.T) {
 
 	streams := []*kallos.Stream{}
 
-	pitchChain := pitchCombinedChain()
+	note, _ := kallos.NoteNumberFromNoteName("c4")
+
+	arpeggio := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{0, 1, 2, 1}, true)
+
+	// pitchChain := pitchCombinedChain()
 
 	s := &kallos.Section{}
 	s.Clock = 1.0
@@ -133,7 +137,7 @@ func TestExportMidi(t *testing.T) {
 		Length: 100,
 	}
 	s.Rhythm = rhythmCombinedChain()
-	s.Pitch = pitchChain
+	s.Pitch = arpeggio
 	s.Velocity = &generators.RandomChoice{
 		Elements: []kallos.Value{100.0, 120.0, 80.0, 90.0},
 	}
