@@ -33,8 +33,6 @@ func TestCore(t *testing.T) {
 
 	stream := s.Stream()
 
-	stream.Sanitize()
-
 	for _, e := range stream.Events {
 		t.Logf("event %v", e)
 	}

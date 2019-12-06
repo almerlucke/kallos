@@ -66,7 +66,7 @@ func (e *Note) String() string {
 func (e *Note) ApplyTransform(transformer Transformer) StreamEvent {
 	ce := NewNote(e.duration, e.Pitch, e.Velocity, e.Channel)
 
-	switch transformer.Type() {
+	switch transformer.TransformType() {
 	case TransformDuration:
 		ce.duration = transformer.TransformValue(ce.duration)
 	case TransformPitch:
@@ -111,7 +111,7 @@ func (e *Pause) String() string {
 func (e *Pause) ApplyTransform(transformer Transformer) StreamEvent {
 	ce := NewPause(e.duration)
 
-	switch transformer.Type() {
+	switch transformer.TransformType() {
 	case TransformDuration:
 		ce.duration = transformer.TransformValue(ce.duration)
 	}
@@ -178,13 +178,11 @@ func (s *Stream) Sanitize() {
 			} else {
 				previousPause = currentPause
 			}
+		} else if previousPause != nil {
+			newEvents = append(newEvents, previousPause, e)
+			previousPause = nil
 		} else {
-			if previousPause != nil {
-				newEvents = append(newEvents, previousPause, e)
-				previousPause = nil
-			} else {
-				newEvents = append(newEvents, e)
-			}
+			newEvents = append(newEvents, e)
 		}
 	}
 

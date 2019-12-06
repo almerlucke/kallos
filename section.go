@@ -59,5 +59,7 @@ func (s *Section) Stream() *Stream {
 		stream.AddEvent(event)
 	}
 
+	stream.Sanitize()
+
 	return stream
 }

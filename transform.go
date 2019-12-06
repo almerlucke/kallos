@@ -21,15 +21,20 @@ const (
 // Transformer can transform a stream, should always return a new stream
 type Transformer interface {
 	TransformValue(v Value) Value
-	Type() TransformType
+	TransformType() TransformType
 }
 
-// basicTransformer implements the basic transformer methods
-type basicTransformer struct {
+// BasicTransformer implements the basic transformer methods
+type BasicTransformer struct {
 	transformType TransformType
 }
 
 // TransformType returns the type of transform
-func (t *basicTransformer) TransformType() TransformType {
+func (t *BasicTransformer) TransformType() TransformType {
 	return t.transformType
+}
+
+// SetTransformType set the type of transform
+func (t *BasicTransformer) SetTransformType(transformType TransformType) {
+	t.transformType = transformType
 }
