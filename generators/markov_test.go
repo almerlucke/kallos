@@ -7,10 +7,10 @@ import (
 )
 
 func chain1() *MarkovChain {
-	state1 := NewMarkovState(NewSequence([]kallos.Value{60, 69, 64, 67, 65}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state2 := NewMarkovState(NewSequence([]kallos.Value{84, 93, 93, 86}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state3 := NewMarkovState(NewSequence([]kallos.Value{72, 65, 74, 83}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state4 := NewMarkovState(NewSequence([]kallos.Value{48, 60, 48, 52, 54}, true), []float64{0.8, 0.1, 0.1}, nil)
+	state1 := NewMarkovState(NewSequence(kallos.ToValues(60, 69, 64, 67, 65), true), []float64{0.8, 0.1, 0.1}, nil)
+	state2 := NewMarkovState(NewSequence(kallos.ToValues(84, 93, 93, 86), true), []float64{0.8, 0.1, 0.1}, nil)
+	state3 := NewMarkovState(NewSequence(kallos.ToValues(72, 65, 74, 83), true), []float64{0.8, 0.1, 0.1}, nil)
+	state4 := NewMarkovState(NewSequence(kallos.ToValues(48, 60, 48, 52, 54), true), []float64{0.8, 0.1, 0.1}, nil)
 
 	state1.States = []*MarkovState{state2, state3, state4}
 	state2.States = []*MarkovState{state3, state4, state1}
@@ -21,10 +21,10 @@ func chain1() *MarkovChain {
 }
 
 func chain2() *MarkovChain {
-	state1 := NewMarkovState(NewSequence([]kallos.Value{62, 65, 64, 69, 69}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state2 := NewMarkovState(NewSequence([]kallos.Value{86, 89, 93, 86}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state3 := NewMarkovState(NewSequence([]kallos.Value{75, 67, 76, 83}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state4 := NewMarkovState(NewSequence([]kallos.Value{36, 60, 48, 36, 52}, true), []float64{0.8, 0.1, 0.1}, nil)
+	state1 := NewMarkovState(NewSequence(kallos.ToValues(62, 65, 64, 69, 69), true), []float64{0.8, 0.1, 0.1}, nil)
+	state2 := NewMarkovState(NewSequence(kallos.ToValues(86, 89, 93, 86), true), []float64{0.8, 0.1, 0.1}, nil)
+	state3 := NewMarkovState(NewSequence(kallos.ToValues(75, 67, 76, 83), true), []float64{0.8, 0.1, 0.1}, nil)
+	state4 := NewMarkovState(NewSequence(kallos.ToValues(36, 60, 48, 36, 52), true), []float64{0.8, 0.1, 0.1}, nil)
 
 	state1.States = []*MarkovState{state2, state3, state4}
 	state2.States = []*MarkovState{state3, state4, state1}
@@ -35,10 +35,10 @@ func chain2() *MarkovChain {
 }
 
 func chain3() *MarkovChain {
-	state1 := NewMarkovState(NewSequence([]kallos.Value{60, 65, 60, 69, 69}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state2 := NewMarkovState(NewSequence([]kallos.Value{84, 89, 84, 86}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state3 := NewMarkovState(NewSequence([]kallos.Value{72, 67, 72, 83}, true), []float64{0.8, 0.1, 0.1}, nil)
-	state4 := NewMarkovState(NewSequence([]kallos.Value{36, 60, 48, 36, 52}, true), []float64{0.8, 0.1, 0.1}, nil)
+	state1 := NewMarkovState(NewSequence(kallos.ToValues(60, 65, 60, 69, 69), true), []float64{0.8, 0.1, 0.1}, nil)
+	state2 := NewMarkovState(NewSequence(kallos.ToValues(84, 89, 84, 86), true), []float64{0.8, 0.1, 0.1}, nil)
+	state3 := NewMarkovState(NewSequence(kallos.ToValues(72, 67, 72, 83), true), []float64{0.8, 0.1, 0.1}, nil)
+	state4 := NewMarkovState(NewSequence(kallos.ToValues(36, 60, 48, 36, 52), true), []float64{0.8, 0.1, 0.1}, nil)
 
 	state1.States = []*MarkovState{state2, state3, state4}
 	state2.States = []*MarkovState{state3, state4, state1}

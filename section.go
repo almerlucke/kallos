@@ -17,7 +17,7 @@ func (sc *LengthStopCondition) ShouldStop(s *Stream) bool {
 
 // DurationStopCondition stops stream creation after the stream reaches a certain duration
 type DurationStopCondition struct {
-	Duration Value
+	Duration float64
 }
 
 // ShouldStop return true if stream creation should stop
@@ -27,7 +27,7 @@ func (sc *DurationStopCondition) ShouldStop(s *Stream) bool {
 
 // Section is a stream producer that uses generators for the production of stream events
 type Section struct {
-	Clock    Value
+	Clock    float64
 	Until    StopCondition
 	Rhythm   Generator
 	Pitch    Generator
@@ -42,7 +42,7 @@ func (s *Section) Stream() *Stream {
 	for !s.Until.ShouldStop(stream) {
 		var event StreamEvent
 
-		duration := s.Rhythm.GenerateValue() * s.Clock
+		duration := s.Rhythm.GenerateValue()[0] * s.Clock
 
 		if duration < 0 {
 			// Pause
@@ -51,7 +51,7 @@ func (s *Section) Stream() *Stream {
 			// Note
 			pitch := s.Pitch.GenerateValue()
 			velocity := s.Velocity.GenerateValue()
-			channel := s.Channel.GenerateValue()
+			channel := int(s.Channel.GenerateValue()[0])
 
 			event = NewNote(duration, pitch, velocity, channel)
 		}

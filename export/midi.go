@@ -8,7 +8,7 @@ import (
 )
 
 // StreamToMidiTrack converts a Kallos stream to a midi track
-func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond kallos.Value) *midi.Track {
+func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond float64) *midi.Track {
 	track := &midi.Track{
 		Events: []midi.Event{},
 	}
@@ -16,33 +16,62 @@ func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond kallos.Value) *midi
 	var me *midi.ChannelEvent
 
 	deltaTime := uint32(0)
+
 	for _, se := range stream.Events {
 		if pause, ok := se.(*kallos.Pause); ok {
 			deltaTime = uint32(pause.Duration() * ticksPerSecond)
 		} else {
 			note := se.(*kallos.Note)
+			channel := uint16(note.Channel)
+			first := true
 
-			me = &midi.ChannelEvent{}
-			me.SetDeltaTime(deltaTime)
-			me.SetEventType(midi.NoteOn)
+			for i, pitch := range note.Pitch {
+				me = &midi.ChannelEvent{}
 
-			channel := uint16(kallos.Clip(note.Channel, kallos.Value(0.0), kallos.Value(15.0)))
-			pitch := uint16(kallos.Clip(note.Pitch, kallos.Value(0.0), kallos.Value(127.0)))
-			me.Channel = channel
-			me.Value1 = pitch
-			me.Value2 = uint16(kallos.Clip(note.Velocity, kallos.Value(0.0), kallos.Value(127.0)))
+				var velocity float64
 
-			track.Events = append(track.Events, me)
+				if i >= len(note.Velocity) {
+					velocity = note.Velocity[len(note.Velocity)-1]
+				} else {
+					velocity = note.Velocity[i]
+				}
+
+				if first {
+					first = false
+					me.SetDeltaTime(deltaTime)
+				} else {
+					me.SetDeltaTime(0)
+				}
+
+				me.SetEventType(midi.NoteOn)
+
+				me.Channel = channel
+				me.Value1 = uint16(pitch)
+				me.Value2 = uint16(velocity)
+
+				track.Events = append(track.Events, me)
+			}
 
 			deltaTime = uint32(note.Duration() * ticksPerSecond)
-			me = &midi.ChannelEvent{}
-			me.SetDeltaTime(deltaTime)
-			me.SetEventType(midi.NoteOff)
-			me.Channel = channel
-			me.Value1 = pitch
-			me.Value2 = uint16(0)
+			first = true
 
-			track.Events = append(track.Events, me)
+			for _, pitch := range note.Pitch {
+				me = &midi.ChannelEvent{}
+
+				if first {
+					first = false
+					me.SetDeltaTime(deltaTime)
+				} else {
+					me.SetDeltaTime(0)
+				}
+
+				me.SetEventType(midi.NoteOff)
+				me.Channel = channel
+				me.Value1 = uint16(pitch)
+				me.Value2 = uint16(0)
+
+				track.Events = append(track.Events, me)
+			}
 
 			deltaTime = 0
 		}
@@ -70,7 +99,7 @@ func StreamsToMidiFile(streams []*kallos.Stream, ticksPerBeat uint16, filePath s
 	midiFile.Chunks = append(midiFile.Chunks, header.Chunk())
 
 	for _, s := range streams {
-		track := StreamToMidiTrack(s, kallos.Value(ticksPerBeat*2))
+		track := StreamToMidiTrack(s, float64(ticksPerBeat*2))
 		midiFile.Chunks = append(midiFile.Chunks, track.Chunk())
 	}
 

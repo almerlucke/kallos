@@ -8,7 +8,7 @@ import (
 type StreamEventType int
 
 const (
-	// NoteEvent plays a note
+	// NoteEvent plays a note (or chord)
 	NoteEvent StreamEventType = iota
 	// PauseEvent take a pause
 	PauseEvent
@@ -17,18 +17,18 @@ const (
 // StreamEvent is the building block of a stream
 type StreamEvent interface {
 	fmt.Stringer
-	Duration() Value
+	Duration() float64
 	Type() StreamEventType
 	ApplyTransform(transformer Transformer) StreamEvent
 }
 
 // basicEvent implements the full StreamEvent interface and can be used by other stream events
 type basicEvent struct {
-	duration  Value
+	duration  float64
 	eventType StreamEventType
 }
 
-func (e *basicEvent) Duration() Value {
+func (e *basicEvent) Duration() float64 {
 	return e.duration
 }
 
@@ -41,11 +41,11 @@ type Note struct {
 	basicEvent
 	Pitch    Value
 	Velocity Value
-	Channel  Value
+	Channel  int
 }
 
 // NewNote creates an initialized note
-func NewNote(duration Value, pitch Value, velocity Value, channel Value) *Note {
+func NewNote(duration float64, pitch Value, velocity Value, channel int) *Note {
 	return &Note{
 		basicEvent: basicEvent{
 			duration:  duration,
@@ -68,19 +68,10 @@ func (e *Note) ApplyTransform(transformer Transformer) StreamEvent {
 
 	switch transformer.TransformType() {
 	case TransformDuration:
-		ce.duration = transformer.TransformValue(ce.duration)
+		ce.duration = transformer.TransformValue(Value{ce.duration})[0]
 	case TransformPitch:
 		ce.Pitch = transformer.TransformValue(ce.Pitch)
 	case TransformVelocity:
-		ce.Velocity = transformer.TransformValue(ce.Velocity)
-	case TransformChannel:
-		ce.Channel = transformer.TransformValue(ce.Channel)
-	case TransformAll:
-		ce.Channel = transformer.TransformValue(ce.Channel)
-		fallthrough
-	case TransformAllButChannel:
-		ce.duration = transformer.TransformValue(ce.duration)
-		ce.Pitch = transformer.TransformValue(ce.Pitch)
 		ce.Velocity = transformer.TransformValue(ce.Velocity)
 	}
 
@@ -93,7 +84,7 @@ type Pause struct {
 }
 
 // NewPause creates an initialized pause
-func NewPause(duration Value) *Pause {
+func NewPause(duration float64) *Pause {
 	return &Pause{
 		basicEvent: basicEvent{
 			duration:  duration,
@@ -113,7 +104,7 @@ func (e *Pause) ApplyTransform(transformer Transformer) StreamEvent {
 
 	switch transformer.TransformType() {
 	case TransformDuration:
-		ce.duration = transformer.TransformValue(ce.duration)
+		ce.duration = transformer.TransformValue(Value{ce.duration})[0]
 	}
 
 	return ce
@@ -127,7 +118,7 @@ type Streamer interface {
 // Stream of events
 type Stream struct {
 	Events   []StreamEvent
-	Duration Value
+	Duration float64
 }
 
 // NewStream creates an initialized stream
@@ -139,8 +130,8 @@ func NewStream() *Stream {
 
 // AddEvent to stream
 func (s *Stream) AddEvent(event StreamEvent) {
-	s.Duration += event.Duration()
 	s.Events = append(s.Events, event)
+	s.Duration += event.Duration()
 }
 
 // ApplyTransform to stream

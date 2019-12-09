@@ -7,11 +7,11 @@ import (
 // Multiplier to multiply a section
 type Multiplier struct {
 	kallos.BasicTransformer
-	Amount kallos.Value
+	Amount float64
 }
 
 // NewMultiplier creates a new multiplier
-func NewMultiplier(v kallos.Value, t kallos.TransformType) *Multiplier {
+func NewMultiplier(v float64, t kallos.TransformType) *Multiplier {
 	m := &Multiplier{
 		Amount: v,
 	}
@@ -23,5 +23,11 @@ func NewMultiplier(v kallos.Value, t kallos.TransformType) *Multiplier {
 
 // TransformValue transform the value
 func (m *Multiplier) TransformValue(v kallos.Value) kallos.Value {
-	return v * m.Amount
+	vc := make(kallos.Value, len(v))
+
+	for i, sv := range v {
+		vc[i] = sv * m.Amount
+	}
+
+	return vc
 }

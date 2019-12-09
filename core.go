@@ -47,8 +47,8 @@ var baseNotePrefixList = []string{
 	"b",
 }
 
-// Value wraps a numeric type
-type Value float64
+// Value wraps a generated value slice
+type Value []float64
 
 // NoteNumberFromNoteName convert a note name to midi note number
 func NoteNumberFromNoteName(name string) (int, error) {
@@ -75,6 +75,17 @@ func NoteNumberFromNoteName(name string) (int, error) {
 }
 
 // Clip value to low and high
-func Clip(v Value, low Value, high Value) Value {
-	return Value(math.Min(math.Max(float64(v), float64(low)), float64(high)))
+func Clip(v float64, low float64, high float64) float64 {
+	return math.Min(math.Max(float64(v), float64(low)), float64(high))
+}
+
+// ToValues convert a number of floats to a slice of Values
+func ToValues(v ...float64) []Value {
+	vs := make([]Value, len(v))
+
+	for i, vc := range v {
+		vs[i] = Value{vc}
+	}
+
+	return vs
 }

@@ -28,10 +28,10 @@ func NewArpeggio(startNote int, scale []int, octaves []int, loop bool) *Arpeggio
 // GenerateValue generate a value
 func (a *Arpeggio) GenerateValue() kallos.Value {
 	if a.done {
-		return kallos.Value(a.StartNote + a.Scale[len(a.Scale)-1] + a.Octaves[len(a.Octaves)-1]*12)
+		return kallos.Value{float64(a.StartNote + a.Scale[len(a.Scale)-1] + a.Octaves[len(a.Octaves)-1]*12)}
 	}
 
-	value := kallos.Value(a.StartNote + a.Scale[a.scaleIndex] + a.Octaves[a.octaveIndex]*12)
+	value := kallos.Value{float64(a.StartNote + a.Scale[a.scaleIndex] + a.Octaves[a.octaveIndex]*12)}
 
 	a.scaleIndex++
 	if a.scaleIndex >= len(a.Scale) {
@@ -46,7 +46,7 @@ func (a *Arpeggio) GenerateValue() kallos.Value {
 		}
 	}
 
-	return kallos.Value(value)
+	return value
 }
 
 // IsContinuous is true if loop is set

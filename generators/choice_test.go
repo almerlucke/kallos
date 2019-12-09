@@ -19,16 +19,16 @@ func TestCore(t *testing.T) {
 		Length: 10,
 	}
 	s.Rhythm = &RandomChoice{
-		Elements: []kallos.Value{-0.25, 0.25, 1.0, -1.0, 2.0, 1.5},
+		Elements: kallos.ToValues(-0.25, 0.25, 1.0, -1.0, 2.0, 1.5),
 	}
 	s.Pitch = &RandomChoice{
-		Elements: []kallos.Value{60.0, 63.0, 65.0, 66.0},
+		Elements: kallos.ToValues(60.0, 63.0, 65.0, 66.0),
 	}
 	s.Velocity = &RandomChoice{
-		Elements: []kallos.Value{100.0, 120.0, 60.0, 30.0},
+		Elements: kallos.ToValues(100.0, 120.0, 60.0, 30.0),
 	}
 	s.Channel = &RandomChoice{
-		Elements: []kallos.Value{1},
+		Elements: kallos.ToValues(1),
 	}
 
 	stream := s.Stream()

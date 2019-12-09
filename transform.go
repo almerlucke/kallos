@@ -10,12 +10,6 @@ const (
 	TransformPitch
 	// TransformVelocity apply transform only on velocity
 	TransformVelocity
-	// TransformChannel apply transform only on channel
-	TransformChannel
-	// TransformAllButChannel apply transform on all fields except channel
-	TransformAllButChannel
-	// TransformAll apply transform on all fields
-	TransformAll
 )
 
 // Transformer can transform a stream, should always return a new stream
