@@ -4,7 +4,7 @@ import (
 	kallos "github.com/almerlucke/gokallos"
 )
 
-// Arpeggio play a scale of notes
+// Arpeggio plays a scale of notes over a range of octaves starting at a given note
 type Arpeggio struct {
 	StartNote   int
 	Scale       []int

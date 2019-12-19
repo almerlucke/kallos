@@ -1,41 +1,25 @@
 package generators
 
 import (
+	"log"
 	"math/rand"
 	"testing"
 
 	kallos "github.com/almerlucke/gokallos"
 )
 
-func TestCore(t *testing.T) {
+func TestChoice(t *testing.T) {
 
 	// seed := time.Now().UTC().UnixNano()
 
 	rand.Seed(12232)
 
-	s := &kallos.Section{}
-	s.Clock = 0.01
-	s.Until = &kallos.LengthStopCondition{
-		Length: 10,
-	}
-	s.Rhythm = &RandomChoice{
-		Elements: kallos.ToValues(-0.25, 0.25, 1.0, -1.0, 2.0, 1.5),
-	}
-	s.Pitch = &RandomChoice{
-		Elements: kallos.ToValues(60.0, 63.0, 65.0, 66.0),
-	}
-	s.Velocity = &RandomChoice{
-		Elements: kallos.ToValues(100.0, 120.0, 60.0, 30.0),
-	}
-	s.Channel = &RandomChoice{
-		Elements: kallos.ToValues(1),
-	}
+	c := NewRandomChoice(kallos.ToValues(60, 61, 62, 63), false, false)
 
-	stream := s.Stream()
-
-	t.Logf("event num %v\n", len(stream.Events))
-
-	for _, e := range stream.Events {
-		t.Logf("event %v", e)
+	index := 0
+	for index < 20 {
+		v := c.GenerateValue()
+		log.Printf("v %v\n", v)
+		index++
 	}
 }
