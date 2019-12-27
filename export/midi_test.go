@@ -7,6 +7,8 @@ import (
 
 	kallos "github.com/almerlucke/gokallos"
 	"github.com/almerlucke/gokallos/generators"
+	"github.com/almerlucke/gokallos/generators/rhythm"
+	"github.com/almerlucke/gokallos/generators/tools"
 )
 
 func pitchChain1() *generators.MarkovChain {
@@ -124,36 +126,40 @@ func TestExportMidi(t *testing.T) {
 
 	streams := []*kallos.Stream{}
 
-	matrix := &generators.RandomWalk2DMatrix{
-		Values: [][]kallos.Value{
-			kallos.ToValues(36, 38, 39, 42, 43, 44),
-			kallos.ToValues(47, 48, 50, 51, 52, 54),
-			kallos.ToValues(55, 58, 59, 60, 63, 64),
-			kallos.ToValues(66, 65, 67, 69, 70, 73),
-			kallos.ToValues(74, 75, 78, 79, 81, 82),
-			kallos.ToValues(84, 86, 87, 90, 91, 92),
-		},
-	}
+	// matrix := &generators.RandomWalk2DMatrix{
+	// 	Values: [][]kallos.Value{
+	// 		kallos.ToValues(36, 38, 39, 42, 43, 44),
+	// 		kallos.ToValues(47, 48, 50, 51, 52, 54),
+	// 		kallos.ToValues(55, 58, 59, 60, 63, 64),
+	// 		kallos.ToValues(66, 65, 67, 69, 70, 73),
+	// 		kallos.ToValues(74, 75, 78, 79, 81, 82),
+	// 		kallos.ToValues(84, 86, 87, 90, 91, 92),
+	// 	},
+	// }
 
-	walker := generators.NewRandomWalk([]int{6, 6}, matrix)
+	//walker := generators.NewRandomWalk([]int{6, 6}, matrix)
 
-	// note, _ := kallos.NoteNumberFromNoteName("c4")
+	note, _ := kallos.NoteNumberFromNoteName("c4")
 
-	// arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{0, 1, 2, 1}, true)
-	// arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, -8, 0, 2, 5, 7}, []int{2, 1, 0, 1}, true)
+	arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{0, 1, 2, 1}, true)
+	arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, -8, 0, 2, 5, 7}, []int{2, 1, 0, 1}, true)
 	// sequence := generators.NewSequence(kallos.ToValues(36, 36, 38, 38, 40, 40, 41, 41, 40, 40), true)
-	// combinator := generators.NewCombinator(arpeggio1, arpeggio2, sequence)
+	combinator := generators.NewCombinator(arpeggio1, arpeggio2)
 
 	// pitchChain := pitchCombinedChain()
 
 	s := &kallos.Section{}
 	s.Clock = 1.0
 	s.Until = &kallos.LengthStopCondition{
-		Length: 100,
+		Length: 300,
 	}
-	s.Rhythm = rhythmCombinedChain()
-	s.Pitch = walker
-	s.Velocity = generators.NewRandomChoice(kallos.ToValues(100.0, 120.0, 80.0, 90.0), true, true)
+	s.Rhythm = rhythm.NewBouncer(
+		tools.NewRamp(20, 0.125, 0.025, 1.4),
+		tools.NewRamp(20, 0.125, 0.025, 1.4),
+		tools.NewRamp(5, 2.0, 0.5, 1.0),
+	)
+	s.Pitch = combinator
+	s.Velocity = generators.NewRamp(tools.NewRamp(20, 30, 100, 0.6), true)
 	s.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// stream := s.Stream()
