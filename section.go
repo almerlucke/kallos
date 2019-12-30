@@ -130,7 +130,7 @@ func (ts TimedSection) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
 		// Start time is in seconds, 120 BPM is default, 0.5 sec per beat,
 		// so multiply with 2 to go from seconds to beats
 		startTimeBeats := entry.StartTime * 2.0
-		notes = append(notes, entry.Section.Stream().TimedNotes(startTimeBeats)...)
+		notes = append(notes, entry.Section.TimedNotes(startTimeBeats)...)
 	}
 
 	sort.Sort(notes)

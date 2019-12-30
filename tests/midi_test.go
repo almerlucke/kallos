@@ -1,4 +1,4 @@
-package export
+package tests
 
 import (
 	"math/rand"
@@ -6,10 +6,10 @@ import (
 	"time"
 
 	kallos "github.com/almerlucke/gokallos"
+
 	"github.com/almerlucke/gokallos/generators"
 	"github.com/almerlucke/gokallos/generators/rhythm"
 	"github.com/almerlucke/gokallos/generators/tools"
-	midi "github.com/almerlucke/gomidi"
 )
 
 func pitchChain1() *generators.MarkovChain {
@@ -125,10 +125,10 @@ func TestExportMidi(t *testing.T) {
 
 	rand.Seed(seed)
 
-	// streams := []*kallos.Stream{}
+	// streams := []*Stream{}
 
 	// matrix := &generators.RandomWalk2DMatrix{
-	// 	Values: [][]kallos.Value{
+	// 	Values: [][]Value{
 	// 		kallos.ToValues(36, 38, 39, 42, 43, 44),
 	// 		kallos.ToValues(47, 48, 50, 51, 52, 54),
 	// 		kallos.ToValues(55, 58, 59, 60, 63, 64),
@@ -175,16 +175,12 @@ func TestExportMidi(t *testing.T) {
 	s2.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
 	s2.Channel = generators.NewStaticValue(kallos.Value{1})
 
-	ts := kallos.TimedSection{
-		&kallos.TimedSectionEntry{
-			StartTime: 0.0,
-			Section:   s1,
-		},
-		&kallos.TimedSectionEntry{
-			StartTime: 4.0,
-			Section:   s2,
-		},
+	ts := kallos.SequentialSection{
+		s1,
+		s2,
 	}
 
-	TracksToMidiFile([]*midi.Track{ts.ToMidiTrack(192)}, uint16(192), "test_output.mid")
+	kallos.MidiTrackersToFile([]kallos.MidiTracker{
+		ts,
+	}, "test_output.mid")
 }
