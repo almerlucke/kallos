@@ -52,10 +52,13 @@ type Section struct {
 func (s *Section) Stream() *Stream {
 	stream := NewStream()
 
+	// We have a fixed BPM of 120 (0.5 seconds per beat), calculate clock multiplier
+	clockMultiplier := s.Clock / 0.5
+
 	for !s.Until.ShouldStop(stream) {
 		var event StreamEvent
 
-		duration := s.Rhythm.GenerateValue()[0] * s.Clock
+		duration := s.Rhythm.GenerateValue()[0] * clockMultiplier
 
 		if duration < 0 {
 			// Pause
@@ -85,15 +88,15 @@ func (s *Section) TimedNotes(startTime float64) TimedNotes {
 }
 
 // ToMidiTrack convert section to midi track
-func (s *Section) ToMidiTrack(ticksPerSecond float64) *midi.Track {
-	return s.TimedNotes(0).ToMidiTrack(ticksPerSecond)
+func (s *Section) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
+	return s.TimedNotes(0).ToMidiTrack(ticksPerQuarterNote)
 }
 
 // SequentialSection sequential sections
 type SequentialSection []*Section
 
 // ToMidiTrack to midi track
-func (ss SequentialSection) ToMidiTrack(ticksPerSecond float64) *midi.Track {
+func (ss SequentialSection) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
 	stream := NewStream()
 
 	for _, section := range ss {
@@ -106,11 +109,12 @@ func (ss SequentialSection) ToMidiTrack(ticksPerSecond float64) *midi.Track {
 
 	notes.CalculateDeltaTimes()
 
-	return notes.ToMidiTrack(ticksPerSecond)
+	return notes.ToMidiTrack(ticksPerQuarterNote)
 }
 
 // TimedSectionEntry holds start time and section
 type TimedSectionEntry struct {
+	// StartTime in seconds
 	StartTime float64
 	Section   *Section
 }
@@ -119,19 +123,19 @@ type TimedSectionEntry struct {
 type TimedSection []*TimedSectionEntry
 
 // ToMidiTrack timed section to single midi track
-func (ts TimedSection) ToMidiTrack(ticksPerSecond float64) *midi.Track {
+func (ts TimedSection) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
 	notes := TimedNotes{}
 
 	for _, entry := range ts {
-		stream := entry.Section.Stream()
-		streamNotes := stream.TimedNotes(entry.StartTime)
-
-		notes = append(notes, streamNotes...)
+		// Start time is in seconds, 120 BPM is default, 0.5 sec per beat,
+		// so multiply with 2 to go from seconds to beats
+		startTimeBeats := entry.StartTime * 2.0
+		notes = append(notes, entry.Section.Stream().TimedNotes(startTimeBeats)...)
 	}
 
 	sort.Sort(notes)
 
 	notes.CalculateDeltaTimes()
 
-	return notes.ToMidiTrack(ticksPerSecond)
+	return notes.ToMidiTrack(ticksPerQuarterNote)
 }

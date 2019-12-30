@@ -56,7 +56,7 @@ func (tn *TimedNote) String() string {
 }
 
 // ToMidiTrack converts a sequence of timed notes to a midi track
-func (tns TimedNotes) ToMidiTrack(ticksPerSecond float64) *midi.Track {
+func (tns TimedNotes) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
 	track := &midi.Track{
 		Events: []midi.Event{},
 	}
@@ -66,7 +66,7 @@ func (tns TimedNotes) ToMidiTrack(ticksPerSecond float64) *midi.Track {
 	for _, note := range tns {
 		me = &midi.ChannelEvent{}
 		me.Channel = uint16(note.Channel)
-		me.SetDeltaTime(uint32(note.DeltaTime * ticksPerSecond))
+		me.SetDeltaTime(uint32(note.DeltaTime * ticksPerQuarterNote))
 
 		me.Value1 = uint16(note.Pitch)
 

@@ -8,7 +8,7 @@ import (
 )
 
 // StreamToMidiTrack converts a Kallos stream to a midi track
-func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond float64) *midi.Track {
+func StreamToMidiTrack(stream *kallos.Stream, ticksPerQuarterNote float64) *midi.Track {
 	track := &midi.Track{
 		Events: []midi.Event{},
 	}
@@ -22,7 +22,7 @@ func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond float64) *midi.Trac
 	for _, note := range notes {
 		me = &midi.ChannelEvent{}
 		me.Channel = uint16(note.Channel)
-		me.SetDeltaTime(uint32(note.DeltaTime * ticksPerSecond))
+		me.SetDeltaTime(uint32(note.DeltaTime * ticksPerQuarterNote * 4))
 
 		me.Value1 = uint16(note.Pitch)
 
@@ -47,19 +47,45 @@ func StreamToMidiTrack(stream *kallos.Stream, ticksPerSecond float64) *midi.Trac
 	return track
 }
 
+// TracksToMidiFile tracks to midi file
+func TracksToMidiFile(tracks []*midi.Track, ticksPerQuarterNote uint16, filePath string) error {
+	header := midi.FileHeader{}
+	header.Format = midi.Format1
+	header.NumTracks = uint16(len(tracks))
+	header.Division = ticksPerQuarterNote
+
+	midiFile := midi.NewFile()
+	midiFile.Chunks = append(midiFile.Chunks, header.Chunk())
+
+	for _, track := range tracks {
+		midiFile.Chunks = append(midiFile.Chunks, track.Chunk())
+	}
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	midiFile.WriteTo(f)
+
+	return nil
+}
+
 // StreamsToMidiFile writes a sequence of streams as separate tracks to a midi file
-func StreamsToMidiFile(streams []*kallos.Stream, ticksPerBeat uint16, filePath string) error {
+func StreamsToMidiFile(streams []*kallos.Stream, ticksPerQuarterNote uint16, filePath string) error {
 
 	header := midi.FileHeader{}
 	header.Format = midi.Format1
 	header.NumTracks = uint16(len(streams))
-	header.Division = ticksPerBeat
+	header.Division = ticksPerQuarterNote
 
 	midiFile := midi.NewFile()
 	midiFile.Chunks = append(midiFile.Chunks, header.Chunk())
 
 	for _, s := range streams {
-		track := StreamToMidiTrack(s, float64(ticksPerBeat*2))
+		track := StreamToMidiTrack(s, float64(ticksPerQuarterNote))
 		midiFile.Chunks = append(midiFile.Chunks, track.Chunk())
 	}
 

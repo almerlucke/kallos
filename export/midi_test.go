@@ -1,7 +1,6 @@
 package export
 
 import (
-	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/almerlucke/gokallos/generators"
 	"github.com/almerlucke/gokallos/generators/rhythm"
 	"github.com/almerlucke/gokallos/generators/tools"
+	midi "github.com/almerlucke/gomidi"
 )
 
 func pitchChain1() *generators.MarkovChain {
@@ -125,7 +125,7 @@ func TestExportMidi(t *testing.T) {
 
 	rand.Seed(seed)
 
-	streams := []*kallos.Stream{}
+	// streams := []*kallos.Stream{}
 
 	// matrix := &generators.RandomWalk2DMatrix{
 	// 	Values: [][]kallos.Value{
@@ -143,39 +143,48 @@ func TestExportMidi(t *testing.T) {
 	note, _ := kallos.NoteNumberFromNoteName("c4")
 
 	arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{3, 2, 1, 0, 2, 1, 0}, true)
-	arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, -8, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
-	// sequence := generators.NewSequence(kallos.ToValues(36, 36, 38, 38, 40, 40, 41, 41, 40, 40), true)
-	combinator := generators.NewCombinator(arpeggio1, arpeggio2)
+	arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
 
 	// pitchChain := pitchCombinedChain()
 
-	s := &kallos.Section{}
-	s.Clock = 1.0
-	s.Until = &kallos.LengthStopCondition{
-		Length: 100,
+	s1 := &kallos.Section{}
+	s1.Clock = 0.5
+	s1.Until = &kallos.LengthStopCondition{
+		Length: 20,
 	}
-	s.Rhythm = rhythm.NewBouncer(
-		tools.NewRamp(10, 0.025, 0.25, 0.6),
-		tools.NewRamp(10, 0.025, 0.25, 0.6),
-		tools.NewRamp(6, 0.20, 3.25, 0.8),
+	s1.Rhythm = rhythm.NewBouncer(
+		tools.NewRamp(10, 0.125, 0.5, 0.6),
+		tools.NewRamp(10, 0.125, 0.5, 0.6),
+		tools.NewRamp(6, 0.25, 1.0, 0.8),
 	)
-	s.Pitch = combinator
-	s.Velocity = generators.NewRamp(tools.NewRamp(10, 80, 20, 0.6), true)
-	s.Channel = generators.NewStaticValue(kallos.Value{1})
+	s1.Pitch = arpeggio1
+	s1.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
+	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
-	stream := s.Stream()
+	s2 := &kallos.Section{}
+	s2.Clock = 0.5
+	s2.Until = &kallos.LengthStopCondition{
+		Length: 30,
+	}
+	s2.Rhythm = rhythm.NewBouncer(
+		tools.NewRamp(10, 0.125, 0.5, 0.6),
+		tools.NewRamp(10, 0.125, 0.5, 0.6),
+		tools.NewRamp(6, 0.25, 1.0, 0.8),
+	)
+	s2.Pitch = arpeggio2
+	s2.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
+	s2.Channel = generators.NewStaticValue(kallos.Value{1})
 
-	reps := stream.TimedNotes(0)
-
-	for _, r := range reps {
-		log.Printf("rep: %v\n", r)
+	ts := kallos.TimedSection{
+		&kallos.TimedSectionEntry{
+			StartTime: 0.0,
+			Section:   s1,
+		},
+		&kallos.TimedSectionEntry{
+			StartTime: 4.0,
+			Section:   s2,
+		},
 	}
 
-	// stream := s.Stream()
-	// transformer := transformers.NewMultiplier(2, kallos.TransformDuration)
-	// stream2 := stream.ApplyTransform(transformer)
-
-	streams = append(streams, stream)
-
-	StreamsToMidiFile(streams, uint16(96), "test_output.mid")
+	TracksToMidiFile([]*midi.Track{ts.ToMidiTrack(192)}, uint16(192), "test_output.mid")
 }
