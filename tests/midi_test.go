@@ -180,7 +180,7 @@ func TestExportMidi(t *testing.T) {
 		s2,
 	}
 
-	kallos.MidiTrackersToFile([]kallos.MidiTracker{
+	kallos.ToMidiFile("test_output.mid", []kallos.MidiTracker{
 		ts,
-	}, "test_output.mid")
+	})
 }

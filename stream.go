@@ -3,6 +3,7 @@ package kallos
 import (
 	"fmt"
 	"math"
+	"sort"
 
 	midi "github.com/almerlucke/gomidi"
 )
@@ -222,17 +223,6 @@ type TimedNote struct {
 // TimedNotes convenience type
 type TimedNotes []*TimedNote
 
-// CalculateDeltaTimes for all timed notes
-func (tns TimedNotes) CalculateDeltaTimes() {
-	for index, rep := range tns {
-		if index > 0 {
-			rep.DeltaTime = rep.Time - tns[index-1].Time
-		} else {
-			rep.DeltaTime = 0
-		}
-	}
-}
-
 // Len for sorting
 func (tns TimedNotes) Len() int {
 	return len(tns)
@@ -257,19 +247,40 @@ func (tn *TimedNote) String() string {
 	return fmt.Sprintf("{Note off - time: %v, pitch: %v, channel: %v}", tn.Time, tn.Pitch, tn.Channel)
 }
 
+// CalculateDeltaTimes for all timed notes
+func (tns TimedNotes) CalculateDeltaTimes() {
+	for index, rep := range tns {
+		if index > 0 {
+			rep.DeltaTime = rep.Time - tns[index-1].Time
+		} else {
+			rep.DeltaTime = 0
+		}
+	}
+}
+
+// Tidy up timed notes, sort and fill delta times
+func (tns TimedNotes) Tidy() {
+	sort.Sort(tns)
+	tns.CalculateDeltaTimes()
+}
+
 // ToMidiTrack converts a sequence of timed notes to a midi track
-func (tns TimedNotes) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
+func (tns TimedNotes) ToMidiTrack() *midi.Track {
 	track := &midi.Track{
 		Events: []midi.Event{},
 	}
 
 	var me *midi.ChannelEvent
 
+	// First tidy up things
+	tns.Tidy()
+
 	for _, note := range tns {
 		me = &midi.ChannelEvent{}
-		me.Channel = uint16(note.Channel)
-		me.SetDeltaTime(uint32(note.DeltaTime * ticksPerQuarterNote))
 
+		me.SetDeltaTime(uint32(note.DeltaTime * TicksPerQuarterNote))
+
+		me.Channel = uint16(note.Channel)
 		me.Value1 = uint16(note.Pitch)
 
 		if note.NoteOn {
@@ -293,7 +304,7 @@ func (tns TimedNotes) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
 	return track
 }
 
-// TimedNotes get timed note representation
+// TimedNotes get timed note representation of stream
 func (s *Stream) TimedNotes(startTime float64) TimedNotes {
 	time := startTime
 	reps := TimedNotes{}

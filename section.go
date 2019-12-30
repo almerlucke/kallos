@@ -1,8 +1,6 @@
 package kallos
 
 import (
-	"sort"
-
 	midi "github.com/almerlucke/gomidi"
 )
 
@@ -53,7 +51,7 @@ func (s *Section) Stream() *Stream {
 	stream := NewStream()
 
 	// We have a fixed BPM of 120 (0.5 seconds per beat), calculate clock multiplier
-	clockMultiplier := s.Clock / 0.5
+	clockMultiplier := s.Clock * BeatsPerSecond
 
 	for !s.Until.ShouldStop(stream) {
 		var event StreamEvent
@@ -88,28 +86,22 @@ func (s *Section) TimedNotes(startTime float64) TimedNotes {
 }
 
 // ToMidiTrack convert section to midi track
-func (s *Section) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
-	return s.TimedNotes(0).ToMidiTrack(ticksPerQuarterNote)
+func (s *Section) ToMidiTrack() *midi.Track {
+	return s.TimedNotes(0).ToMidiTrack()
 }
 
 // SequentialSection sequential sections
 type SequentialSection []*Section
 
 // ToMidiTrack to midi track
-func (ss SequentialSection) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
+func (ss SequentialSection) ToMidiTrack() *midi.Track {
 	stream := NewStream()
 
 	for _, section := range ss {
-		otherStream := section.Stream()
-		stream = stream.Append(otherStream)
+		stream = stream.Append(section.Stream())
 	}
 
-	notes := stream.TimedNotes(0)
-	sort.Sort(notes)
-
-	notes.CalculateDeltaTimes()
-
-	return notes.ToMidiTrack(ticksPerQuarterNote)
+	return stream.TimedNotes(0).ToMidiTrack()
 }
 
 // TimedSectionEntry holds start time and section
@@ -123,19 +115,15 @@ type TimedSectionEntry struct {
 type TimedSection []*TimedSectionEntry
 
 // ToMidiTrack timed section to single midi track
-func (ts TimedSection) ToMidiTrack(ticksPerQuarterNote float64) *midi.Track {
+func (ts TimedSection) ToMidiTrack() *midi.Track {
 	notes := TimedNotes{}
 
 	for _, entry := range ts {
 		// Start time is in seconds, 120 BPM is default, 0.5 sec per beat,
 		// so multiply with 2 to go from seconds to beats
-		startTimeBeats := entry.StartTime * 2.0
+		startTimeBeats := entry.StartTime * BeatsPerSecond
 		notes = append(notes, entry.Section.TimedNotes(startTimeBeats)...)
 	}
 
-	sort.Sort(notes)
-
-	notes.CalculateDeltaTimes()
-
-	return notes.ToMidiTrack(ticksPerQuarterNote)
+	return notes.ToMidiTrack()
 }

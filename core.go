@@ -7,6 +7,17 @@ import (
 	"strings"
 )
 
+const (
+	// TicksPerQuarterNote constant
+	TicksPerQuarterNote float64 = 192.0
+	// BPM constant
+	BPM float64 = 120.0
+	// SecondsPerBeat constant
+	SecondsPerBeat float64 = 0.5
+	// BeatsPerSecond constant
+	BeatsPerSecond float64 = 2.0
+)
+
 var baseNoteNameMap = map[string]int{
 	"c":  0,
 	"c#": 1,

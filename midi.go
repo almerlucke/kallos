@@ -8,23 +8,21 @@ import (
 
 // MidiTracker type that can generate a midi track
 type MidiTracker interface {
-	ToMidiTrack(ticksPerQuarterNote float64) *midi.Track
+	ToMidiTrack() *midi.Track
 }
 
-// MidiTrackersToFile create file from midi track generators
-func MidiTrackersToFile(trackers []MidiTracker, filePath string) error {
-	ticksPerQuarterNote := 192.0
-
+// ToMidiFile create file from midi trackers
+func ToMidiFile(filePath string, trackers []MidiTracker) error {
 	header := midi.FileHeader{}
 	header.Format = midi.Format1
 	header.NumTracks = uint16(len(trackers))
-	header.Division = uint16(ticksPerQuarterNote)
+	header.Division = uint16(TicksPerQuarterNote)
 
 	midiFile := midi.NewFile()
 	midiFile.Chunks = append(midiFile.Chunks, header.Chunk())
 
 	for _, tracker := range trackers {
-		track := tracker.ToMidiTrack(ticksPerQuarterNote)
+		track := tracker.ToMidiTrack()
 		midiFile.Chunks = append(midiFile.Chunks, track.Chunk())
 	}
 
