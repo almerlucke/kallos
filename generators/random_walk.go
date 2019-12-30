@@ -3,7 +3,7 @@ package generators
 import (
 	"math/rand"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 type RandomWalkMatrix interface {

@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 func TestChoice(t *testing.T) {

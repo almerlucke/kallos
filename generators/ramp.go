@@ -1,9 +1,9 @@
 package generators
 
 import (
-	"github.com/almerlucke/gokallos/generators/tools"
+	"github.com/almerlucke/kallos/generators/tools"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 type Ramp struct {

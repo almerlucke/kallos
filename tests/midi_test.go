@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 
-	"github.com/almerlucke/gokallos/generators"
-	"github.com/almerlucke/gokallos/generators/rhythm"
-	"github.com/almerlucke/gokallos/generators/tools"
+	"github.com/almerlucke/kallos/generators"
+	"github.com/almerlucke/kallos/generators/rhythm"
+	"github.com/almerlucke/kallos/generators/tools"
 )
 
 func pitchChain1() *generators.MarkovChain {

@@ -1,7 +1,7 @@
 package generators
 
 import (
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 // Arpeggio plays a scale of notes over a range of octaves starting at a given note

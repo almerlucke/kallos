@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 func TestRandomWalk(t *testing.T) {

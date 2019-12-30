@@ -1,4 +1,4 @@
-package gokallos
+package kallos
 
 // TransformType identifies the type of transform
 type TransformType int

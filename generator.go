@@ -1,4 +1,4 @@
-package gokallos
+package kallos
 
 // Generator generates a value if asked
 // Done and Reset are ignored by most use cases

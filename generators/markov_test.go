@@ -3,7 +3,7 @@ package generators
 import (
 	"testing"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 func chain1() *MarkovChain {

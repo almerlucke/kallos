@@ -1,7 +1,7 @@
 package transformers
 
 import (
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 )
 
 // Multiplier to multiply a section

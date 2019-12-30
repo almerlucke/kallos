@@ -3,9 +3,9 @@ package rhythm
 import (
 	"log"
 
-	kallos "github.com/almerlucke/gokallos"
+	"github.com/almerlucke/kallos"
 
-	"github.com/almerlucke/gokallos/generators/tools"
+	"github.com/almerlucke/kallos/generators/tools"
 )
 
 type Bouncer struct {

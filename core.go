@@ -1,4 +1,4 @@
-package gokallos
+package kallos
 
 import (
 	"errors"

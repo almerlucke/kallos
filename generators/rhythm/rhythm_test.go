@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/almerlucke/gokallos/generators/tools"
+	"github.com/almerlucke/kallos/generators/tools"
 )
 
 func TestRhythm(t *testing.T) {
