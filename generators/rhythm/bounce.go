@@ -1,6 +1,8 @@
 package rhythm
 
 import (
+	"log"
+
 	kallos "github.com/almerlucke/gokallos"
 
 	"github.com/almerlucke/gokallos/generators/tools"
@@ -36,6 +38,8 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 		if !d {
 			b.waitRamp.Reset()
 		}
+
+		log.Printf("wait %v\n", k)
 
 		k = -k
 	} else {

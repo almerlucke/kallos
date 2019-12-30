@@ -1,6 +1,7 @@
 package export
 
 import (
+	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -151,7 +152,7 @@ func TestExportMidi(t *testing.T) {
 	s := &kallos.Section{}
 	s.Clock = 1.0
 	s.Until = &kallos.LengthStopCondition{
-		Length: 300,
+		Length: 100,
 	}
 	s.Rhythm = rhythm.NewBouncer(
 		tools.NewRamp(10, 0.025, 0.25, 0.6),
@@ -159,14 +160,22 @@ func TestExportMidi(t *testing.T) {
 		tools.NewRamp(6, 0.20, 3.25, 0.8),
 	)
 	s.Pitch = combinator
-	s.Velocity = generators.NewRamp(tools.NewRamp(20, 80, 20, 0.6), true)
+	s.Velocity = generators.NewRamp(tools.NewRamp(10, 80, 20, 0.6), true)
 	s.Channel = generators.NewStaticValue(kallos.Value{1})
+
+	stream := s.Stream()
+
+	reps := stream.TimedNotes(0)
+
+	for _, r := range reps {
+		log.Printf("rep: %v\n", r)
+	}
 
 	// stream := s.Stream()
 	// transformer := transformers.NewMultiplier(2, kallos.TransformDuration)
 	// stream2 := stream.ApplyTransform(transformer)
 
-	streams = append(streams, s.Stream())
+	streams = append(streams, stream)
 
 	StreamsToMidiFile(streams, uint16(96), "test_output.mid")
 }

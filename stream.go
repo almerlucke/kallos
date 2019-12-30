@@ -2,6 +2,7 @@ package gokallos
 
 import (
 	"fmt"
+	"math"
 )
 
 // StreamEventType identifies the type of stream event
@@ -117,8 +118,9 @@ type Streamer interface {
 
 // Stream of events
 type Stream struct {
-	Events   []StreamEvent
-	Duration float64
+	Events        []StreamEvent
+	Duration      float64
+	NumNoteEvents int
 }
 
 // NewStream creates an initialized stream
@@ -132,6 +134,25 @@ func NewStream() *Stream {
 func (s *Stream) AddEvent(event StreamEvent) {
 	s.Events = append(s.Events, event)
 	s.Duration += event.Duration()
+
+	if event.Type() == NoteEvent {
+		s.NumNoteEvents++
+	}
+}
+
+// Append a stream and return a new stream
+func (s *Stream) Append(sc *Stream) *Stream {
+	copy := NewStream()
+
+	for _, e := range s.Events {
+		copy.AddEvent(e)
+	}
+
+	for _, e := range sc.Events {
+		copy.AddEvent(e)
+	}
+
+	return copy
 }
 
 // ApplyTransform to stream
@@ -182,4 +203,47 @@ func (s *Stream) Sanitize() {
 	}
 
 	s.Events = newEvents
+}
+
+// TimedNotes get timed note representation
+func (s *Stream) TimedNotes(startTime float64) TimedNotes {
+	time := startTime
+	reps := TimedNotes{}
+
+	for _, e := range s.Events {
+		if e.Type() == NoteEvent {
+			n := e.(*Note)
+			// Add note on for all pitches
+			for index, pitch := range n.Pitch {
+				velocityIndex := int(math.Min(float64(index), float64(len(n.Velocity)-1)))
+				rep := &TimedNote{
+					Time:     time,
+					NoteOn:   true,
+					Pitch:    pitch,
+					Velocity: n.Velocity[velocityIndex],
+					Channel:  n.Channel,
+				}
+
+				reps = append(reps, rep)
+			}
+
+			time += e.Duration()
+
+			// Add note off for all pitches
+			for _, pitch := range n.Pitch {
+				rep := &TimedNote{
+					Time:    time,
+					NoteOn:  false,
+					Pitch:   pitch,
+					Channel: n.Channel,
+				}
+
+				reps = append(reps, rep)
+			}
+		} else {
+			time += e.Duration()
+		}
+	}
+
+	return reps
 }
