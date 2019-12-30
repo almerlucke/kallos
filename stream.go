@@ -121,25 +121,25 @@ type Streamer interface {
 
 // Stream of events
 type Stream struct {
-	Events        []StreamEvent
-	Duration      float64
-	NumNoteEvents int
+	events        []StreamEvent
+	duration      float64
+	numNoteEvents int
 }
 
 // NewStream creates an initialized stream
 func NewStream() *Stream {
 	return &Stream{
-		Events: []StreamEvent{},
+		events: []StreamEvent{},
 	}
 }
 
 // AddEvent to stream
 func (s *Stream) AddEvent(event StreamEvent) {
-	s.Events = append(s.Events, event)
-	s.Duration += event.Duration()
+	s.events = append(s.events, event)
+	s.duration += event.Duration()
 
 	if event.Type() == NoteEvent {
-		s.NumNoteEvents++
+		s.numNoteEvents++
 	}
 }
 
@@ -147,11 +147,11 @@ func (s *Stream) AddEvent(event StreamEvent) {
 func (s *Stream) Append(sc *Stream) *Stream {
 	copy := NewStream()
 
-	for _, e := range s.Events {
+	for _, e := range s.events {
 		copy.AddEvent(e)
 	}
 
-	for _, e := range sc.Events {
+	for _, e := range sc.events {
 		copy.AddEvent(e)
 	}
 
@@ -167,7 +167,7 @@ func (s *Stream) ApplyTransform(t Transformer) *Stream {
 func (s *Stream) ApplyTransforms(ts []Transformer) *Stream {
 	cs := NewStream()
 
-	for _, e := range s.Events {
+	for _, e := range s.events {
 		ce := e
 
 		for _, t := range ts {
@@ -186,7 +186,7 @@ func (s *Stream) Sanitize() {
 
 	var previousPause *Pause
 
-	for _, e := range s.Events {
+	for _, e := range s.events {
 		if currentPause, ok := e.(*Pause); ok {
 			if previousPause != nil {
 				previousPause.duration += currentPause.duration
@@ -205,7 +205,27 @@ func (s *Stream) Sanitize() {
 		newEvents = append(newEvents, previousPause)
 	}
 
-	s.Events = newEvents
+	s.events = newEvents
+}
+
+// Duration of the stream for stoppable interface
+func (s *Stream) Duration() float64 {
+	return s.duration
+}
+
+// NumNoteEvents number of notes (not pauses) for stoppable interface
+func (s *Stream) NumNoteEvents() int {
+	return s.numNoteEvents
+}
+
+// LastEventIsNote for stoppable interface
+func (s *Stream) LastEventIsNote() bool {
+	if len(s.events) > 1 {
+		lastEvent := s.events[len(s.events)-1]
+		return lastEvent.Type() == NoteEvent
+	}
+
+	return false
 }
 
 // TimedNote timed note representation to allow for easy
@@ -309,7 +329,7 @@ func (s *Stream) TimedNotes(startTime float64) TimedNotes {
 	time := startTime
 	reps := TimedNotes{}
 
-	for _, e := range s.Events {
+	for _, e := range s.events {
 		if e.Type() == NoteEvent {
 			n := e.(*Note)
 			// Add note on for all pitches

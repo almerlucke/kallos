@@ -4,38 +4,6 @@ import (
 	midi "github.com/almerlucke/gomidi"
 )
 
-// StopCondition stops stream creation
-type StopCondition interface {
-	ShouldStop(s *Stream) bool
-}
-
-// LengthStopCondition stops stream creation after the stream reaches a certain length
-type LengthStopCondition struct {
-	Length uint32
-}
-
-// ShouldStop return true if stream creation should stop
-func (sc *LengthStopCondition) ShouldStop(s *Stream) bool {
-	return uint32(s.NumNoteEvents) >= sc.Length
-}
-
-// DurationStopCondition stops stream creation after the stream reaches a certain duration
-type DurationStopCondition struct {
-	Duration float64
-}
-
-// ShouldStop return true if stream creation should stop
-func (sc *DurationStopCondition) ShouldStop(s *Stream) bool {
-	if len(s.Events) > 1 {
-		lastEvent := s.Events[len(s.Events)-1]
-		if lastEvent.Type() == NoteEvent {
-			return s.Duration >= sc.Duration
-		}
-	}
-
-	return false
-}
-
 // Section is a stream producer that uses generators for the production of stream events
 type Section struct {
 	Clock    float64

@@ -143,15 +143,13 @@ func TestExportMidi(t *testing.T) {
 	note, _ := kallos.NoteNumberFromNoteName("c4")
 
 	arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{3, 2, 1, 0, 2, 1, 0}, true)
-	arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
+	// arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
 
 	// pitchChain := pitchCombinedChain()
 
 	s1 := &kallos.Section{}
 	s1.Clock = 0.5
-	s1.Until = &kallos.LengthStopCondition{
-		Length: 20,
-	}
+	s1.Until = kallos.NewDurationStopCondition(30.0)
 	s1.Rhythm = rhythm.NewBouncer(
 		tools.NewRamp(10, 0.125, 0.5, 0.6),
 		tools.NewRamp(10, 0.125, 0.5, 0.6),
@@ -161,26 +159,26 @@ func TestExportMidi(t *testing.T) {
 	s1.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
-	s2 := &kallos.Section{}
-	s2.Clock = 0.5
-	s2.Until = &kallos.LengthStopCondition{
-		Length: 30,
-	}
-	s2.Rhythm = rhythm.NewBouncer(
-		tools.NewRamp(10, 0.125, 0.5, 0.6),
-		tools.NewRamp(10, 0.125, 0.5, 0.6),
-		tools.NewRamp(6, 0.25, 1.0, 0.8),
-	)
-	s2.Pitch = arpeggio2
-	s2.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
-	s2.Channel = generators.NewStaticValue(kallos.Value{1})
+	// s2 := &kallos.Section{}
+	// s2.Clock = 0.5
+	// s2.Until = &kallos.LengthStopCondition{
+	// 	Length: 30,
+	// }
+	// s2.Rhythm = rhythm.NewBouncer(
+	// 	tools.NewRamp(10, 0.125, 0.5, 0.6),
+	// 	tools.NewRamp(10, 0.125, 0.5, 0.6),
+	// 	tools.NewRamp(6, 0.25, 1.0, 0.8),
+	// )
+	// s2.Pitch = arpeggio2
+	// s2.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
+	// s2.Channel = generators.NewStaticValue(kallos.Value{1})
 
-	ts := kallos.SequentialSection{
-		s1,
-		s2,
-	}
+	// ts := kallos.SequentialSection{
+	// 	s1,
+	// 	s2,
+	// }
 
 	kallos.ToMidiFile("test_output.mid", []kallos.MidiTracker{
-		ts,
+		s1,
 	})
 }
