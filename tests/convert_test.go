@@ -19,11 +19,11 @@ func TestConvert(t *testing.T) {
 
 	v := kallos.Values(kallos.ToValues(10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
 
-	cv := shape.Convert(v, 20)
+	cv := shape.Convert(20, v)
 	t.Logf("values %v\n", cv)
 
 	r := kallos.NewRange(3, 30)
 
-	cv = shape.Convert(r, 20).Apply(math.Round)
+	cv = shape.Convert(20, r).Apply(math.Round)
 	t.Logf("range %v\n", cv)
 }

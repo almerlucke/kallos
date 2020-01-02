@@ -141,12 +141,9 @@ func TestExportMidi(t *testing.T) {
 
 	//walker := generators.NewRandomWalk([]int{6, 6}, matrix)
 
-	shape := kallos.Shape{}
-	i := 0.0
-	for i < 128.0 {
-		shape = append(shape, math.Sin(math.Pi*2*i/128.0)*0.5+0.5)
-		i += 1.0
-	}
+	shape := kallos.CreateShape(func(i int, n int) float64 {
+		return math.Sin(math.Pi*2*float64(i)/float64(n))*0.5 + 0.5
+	}, 128)
 
 	velocities := kallos.ToValues(30, 40, 50, 60, 70, 80, 90, 100, 110, 120)
 
@@ -172,7 +169,7 @@ func TestExportMidi(t *testing.T) {
 	s1.Until = kallos.NewLengthStopCondition(uint32(rhythm.NumNoteEvents()))
 	s1.Rhythm = generators.NewSequence(rhythm.Values(), true)
 	s1.Pitch = arpeggio1
-	s1.Velocity = generators.NewSequence(shape.Convert(velocities, rhythm.NumNoteEvents()), true)
+	s1.Velocity = generators.NewSequence(shape.Convert(rhythm.NumNoteEvents(), velocities), true)
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// s2 := &kallos.Section{}

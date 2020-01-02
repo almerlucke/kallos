@@ -64,8 +64,21 @@ func (v Values) ConvertShape(shape Shape, n int) Values {
 	return result
 }
 
+// CreateShape by executing n times f(i, n)
+func CreateShape(f func(int, int) float64, n int) Shape {
+	i := 0
+	shape := Shape{}
+
+	for i < n {
+		shape = append(shape, f(i, n))
+		i++
+	}
+
+	return shape
+}
+
 // Convert a shape
-func (shape Shape) Convert(c ShapeConverter, n int) Values {
+func (shape Shape) Convert(n int, c ShapeConverter) Values {
 	return c.ConvertShape(shape, n)
 }
 
