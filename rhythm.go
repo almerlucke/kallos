@@ -13,18 +13,22 @@ type Rhythm struct {
 	rhythm        []float64
 }
 
-// NewRhythm initializes a new rhythm object
+// NewRhythm initializes a new rhythm object and generates all note durations
 func NewRhythm(clock float64, until StopCondition, generator Generator) *Rhythm {
-	return &Rhythm{
+	r := &Rhythm{
 		clock:     clock,
 		until:     until,
 		generator: generator,
 		rhythm:    []float64{},
 	}
+
+	r.generate()
+
+	return r
 }
 
-// Generate a rhythm until a condition is met
-func (r *Rhythm) Generate() []float64 {
+// Run a rhythm until a condition is met
+func (r *Rhythm) generate() {
 	for !r.until.ShouldStop(r) {
 		// We have a fixed BPM of 120 (0.5 seconds per beat), calculate clock multiplier
 		clockMultiplier := r.clock * BeatsPerSecond
@@ -40,8 +44,11 @@ func (r *Rhythm) Generate() []float64 {
 
 		r.rhythm = append(r.rhythm, duration)
 	}
+}
 
-	return r.rhythm
+// Values returns the generated rhythm as Values
+func (r *Rhythm) Values() Values {
+	return ToValues(r.rhythm...)
 }
 
 // NumNoteEvents for stoppable interface

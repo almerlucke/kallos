@@ -1,10 +1,7 @@
 package kallos
 
 import (
-	"errors"
 	"math"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -18,78 +15,100 @@ const (
 	BeatsPerSecond float64 = 2.0
 )
 
-var baseNoteNameMap = map[string]int{
-	"c":  0,
-	"c#": 1,
-	"db": 1,
-	"d":  2,
-	"d#": 3,
-	"eb": 3,
-	"e":  4,
-	"f":  5,
-	"f#": 6,
-	"gb": 6,
-	"g":  7,
-	"g#": 8,
-	"ab": 8,
-	"a":  9,
-	"a#": 10,
-	"bb": 10,
-	"b":  11,
-}
-
-var baseNotePrefixList = []string{
-	"c#",
-	"c",
-	"db",
-	"d#",
-	"d",
-	"eb",
-	"e",
-	"f#",
-	"f",
-	"gb",
-	"g#",
-	"g",
-	"ab",
-	"a#",
-	"a",
-	"bb",
-	"b",
-}
-
 // Value wraps a generated value slice
 type Value []float64
 
 // Values wraps a slice of Value's
 type Values []Value
 
-// NoteNumberFromNoteName convert a note name to midi note number
-func NoteNumberFromNoteName(name string) (int, error) {
-	name = strings.ToLower(name)
-	foundPrefix := ""
+// Shape represents an abstract shape (between 0.0 and 1.0 inclusive)
+// which can be used by a shape converter
+type Shape []float64
 
-	for _, prefix := range baseNotePrefixList {
-		if strings.HasPrefix(name, prefix) {
-			foundPrefix = prefix
-			break
-		}
+// ShapeConverter converts a shape to a slice of values
+type ShapeConverter interface {
+	ConvertShape(shape Shape, n int) Values
+}
+
+// IntegerRange to use in convert
+type IntegerRange struct {
+	Low  int64
+	High int64
+}
+
+// Convert a shape
+func (shape Shape) Convert(c ShapeConverter, n int) Values {
+	return c.ConvertShape(shape, n)
+}
+
+// Lookup with a fractional index
+func (shape Shape) Lookup(index float64) float64 {
+	i1 := int(index)
+	i2 := i1 + 1
+	v := shape[i1]
+
+	if i2 < len(shape) {
+		v += (shape[i2] - v) * (index - float64(i1))
 	}
 
-	if foundPrefix == "" {
-		return 0, errors.New("invalid note number")
+	return v
+}
+
+// ConvertShape for a slice of Value's, interpolate over shape in n steps,
+// use shape value to lookup index of Values
+func (v Values) ConvertShape(shape Shape, n int) Values {
+	acc := 0.0
+	inc := float64(len(shape)-1) / float64(n-1)
+	m := float64(len(v) - 1)
+	result := Values{}
+
+	for n > 0 {
+		result = append(result, v[int(math.Round(shape.Lookup(acc)*m))])
+		acc += inc
+		n--
 	}
 
-	offset, err := strconv.Atoi(name[len(foundPrefix):])
-	if err != nil {
-		return 0, err
+	return result
+}
+
+// ConvertShape convert a shape over an integer range
+func (r *IntegerRange) ConvertShape(shape Shape, n int) Values {
+	acc := 0.0
+	inc := float64(len(shape)-1) / float64(n-1)
+	result := Values{}
+
+	dif := float64(r.High - r.Low)
+	min := float64(r.Low)
+
+	for n > 0 {
+		result = append(result, Value{math.Round(min + shape.Lookup(acc)*dif)})
+		acc += inc
+		n--
 	}
 
-	return 12 + offset*12 + baseNoteNameMap[foundPrefix], nil
+	return result
+}
+
+// NewIntegerRange creates a new integer range
+func NewIntegerRange(low int64, high int64) *IntegerRange {
+	if high < low {
+		tmp := high
+		high = low
+		low = tmp
+	}
+
+	return &IntegerRange{
+		Low:  low,
+		High: high,
+	}
 }
 
 // Clip value to low and high
 func Clip(v float64, low float64, high float64) float64 {
+	if low > high {
+		return math.Min(math.Max(float64(v), float64(high)), float64(low))
+	}
+
 	return math.Min(math.Max(float64(v), float64(low)), float64(high))
 }
 

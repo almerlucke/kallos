@@ -1,15 +1,23 @@
 package tests
 
 import (
+	"math"
 	"testing"
 
 	"github.com/almerlucke/kallos"
 )
 
 func TestConvert(t *testing.T) {
-	shape := kallos.Shape{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}
+	shape := kallos.Shape{}
+	i := 0.0
+	for i < 20.0 {
+		shape = append(shape, math.Sin(math.Pi*2*i/20.0)*0.5+0.5)
+		i += 1.0
+	}
 	v := kallos.Values(kallos.ToValues(10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
-	v = v.ConvertShape(shape, 20)
-
-	t.Logf("values %v\n", v)
+	r := kallos.NewIntegerRange(3, 30)
+	cv := shape.Convert(v, 20)
+	t.Logf("values %v\n", cv)
+	cv = shape.Convert(r, 20)
+	t.Logf("range %v\n", cv)
 }

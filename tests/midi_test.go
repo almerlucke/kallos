@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -140,6 +141,15 @@ func TestExportMidi(t *testing.T) {
 
 	//walker := generators.NewRandomWalk([]int{6, 6}, matrix)
 
+	shape := kallos.Shape{}
+	i := 0.0
+	for i < 128.0 {
+		shape = append(shape, math.Sin(math.Pi*2*i/128.0)*0.5+0.5)
+		i += 1.0
+	}
+
+	velocities := kallos.ToValues(30, 40, 50, 60, 70, 80, 90, 100, 110, 120)
+
 	note, _ := kallos.NoteNumberFromNoteName("c4")
 
 	arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{3, 2, 1, 0, 2, 1, 0}, true)
@@ -147,16 +157,22 @@ func TestExportMidi(t *testing.T) {
 
 	// pitchChain := pitchCombinedChain()
 
+	rhythm := kallos.NewRhythm(
+		0.5,
+		kallos.NewDurationStopCondition(30.0),
+		rhythm.NewBouncer(
+			tools.NewRamp(10, 0.125, 0.5, 0.6),
+			tools.NewRamp(10, 0.125, 0.5, 0.6),
+			tools.NewRamp(6, 0.25, 1.0, 0.8),
+		),
+	)
+
 	s1 := &kallos.Section{}
 	s1.Clock = 0.5
-	s1.Until = kallos.NewDurationStopCondition(30.0)
-	s1.Rhythm = rhythm.NewBouncer(
-		tools.NewRamp(10, 0.125, 0.5, 0.6),
-		tools.NewRamp(10, 0.125, 0.5, 0.6),
-		tools.NewRamp(6, 0.25, 1.0, 0.8),
-	)
+	s1.Until = kallos.NewLengthStopCondition(uint32(rhythm.NumNoteEvents()))
+	s1.Rhythm = generators.NewSequence(rhythm.Values(), true)
 	s1.Pitch = arpeggio1
-	s1.Velocity = generators.NewRamp(tools.NewRamp(10, 110, 20, 0.6), true)
+	s1.Velocity = generators.NewSequence(shape.Convert(velocities, rhythm.NumNoteEvents()), true)
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// s2 := &kallos.Section{}

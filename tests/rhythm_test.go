@@ -14,7 +14,7 @@ func TestRhythm(t *testing.T) {
 		generators.NewRandomChoice(kallos.ToValues(2.0, -2.0, 3.0, 1.0, -1.0), false, true),
 	)
 
-	sequence := rhythm.Generate()
+	sequence := rhythm.Values()
 
 	t.Logf("sequence %v\n", sequence)
 }
