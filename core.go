@@ -30,25 +30,18 @@ type ShapeConverter interface {
 	ConvertShape(shape Shape, n int) Values
 }
 
-// IntegerRange to use in convert
-type IntegerRange struct {
-	Low  int64
-	High int64
+// Range to use in convert
+type Range struct {
+	Low  float64
+	High float64
 }
 
-// Convert a shape
-func (shape Shape) Convert(c ShapeConverter, n int) Values {
-	return c.ConvertShape(shape, n)
-}
-
-// Lookup with a fractional index
-func (shape Shape) Lookup(index float64) float64 {
-	i1 := int(index)
-	i2 := i1 + 1
-	v := shape[i1]
-
-	if i2 < len(shape) {
-		v += (shape[i2] - v) * (index - float64(i1))
+// Apply a function to all elements (and sub elements) of Values
+func (v Values) Apply(f func(float64) float64) Values {
+	for _, e := range v {
+		for i := range e {
+			e[i] = f(e[i])
+		}
 	}
 
 	return v
@@ -71,17 +64,35 @@ func (v Values) ConvertShape(shape Shape, n int) Values {
 	return result
 }
 
-// ConvertShape convert a shape over an integer range
-func (r *IntegerRange) ConvertShape(shape Shape, n int) Values {
+// Convert a shape
+func (shape Shape) Convert(c ShapeConverter, n int) Values {
+	return c.ConvertShape(shape, n)
+}
+
+// Lookup with a fractional index
+func (shape Shape) Lookup(index float64) float64 {
+	i1 := int(index)
+	i2 := i1 + 1
+	v := shape[i1]
+
+	if i2 < len(shape) {
+		v += (shape[i2] - v) * (index - float64(i1))
+	}
+
+	return v
+}
+
+// ConvertShape convert a shape over a range
+func (r *Range) ConvertShape(shape Shape, n int) Values {
 	acc := 0.0
 	inc := float64(len(shape)-1) / float64(n-1)
 	result := Values{}
 
-	dif := float64(r.High - r.Low)
-	min := float64(r.Low)
+	dif := r.High - r.Low
+	min := r.Low
 
 	for n > 0 {
-		result = append(result, Value{math.Round(min + shape.Lookup(acc)*dif)})
+		result = append(result, Value{min + shape.Lookup(acc)*dif})
 		acc += inc
 		n--
 	}
@@ -89,15 +100,15 @@ func (r *IntegerRange) ConvertShape(shape Shape, n int) Values {
 	return result
 }
 
-// NewIntegerRange creates a new integer range
-func NewIntegerRange(low int64, high int64) *IntegerRange {
+// NewRange creates a new range
+func NewRange(low float64, high float64) *Range {
 	if high < low {
 		tmp := high
 		high = low
 		low = tmp
 	}
 
-	return &IntegerRange{
+	return &Range{
 		Low:  low,
 		High: high,
 	}
