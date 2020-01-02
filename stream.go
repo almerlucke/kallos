@@ -284,8 +284,8 @@ func (tns TimedNotes) Tidy() {
 	tns.CalculateDeltaTimes()
 }
 
-// ToMidiTrack converts a sequence of timed notes to a midi track
-func (tns TimedNotes) ToMidiTrack() *midi.Track {
+// MidiTrack converts a sequence of timed notes to a midi track
+func (tns TimedNotes) MidiTrack() *midi.Track {
 	track := &midi.Track{
 		Events: []midi.Event{},
 	}

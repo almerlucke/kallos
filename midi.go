@@ -8,7 +8,7 @@ import (
 
 // MidiTracker type that can generate a midi track
 type MidiTracker interface {
-	ToMidiTrack() *midi.Track
+	MidiTrack() *midi.Track
 }
 
 // ToMidiFile create file from midi trackers
@@ -22,7 +22,7 @@ func ToMidiFile(filePath string, trackers []MidiTracker) error {
 	midiFile.Chunks = append(midiFile.Chunks, header.Chunk())
 
 	for _, tracker := range trackers {
-		track := tracker.ToMidiTrack()
+		track := tracker.MidiTrack()
 		midiFile.Chunks = append(midiFile.Chunks, track.Chunk())
 	}
 

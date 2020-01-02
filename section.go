@@ -53,23 +53,23 @@ func (s *Section) TimedNotes(startTime float64) TimedNotes {
 	return stream.TimedNotes(startTime)
 }
 
-// ToMidiTrack convert section to midi track
-func (s *Section) ToMidiTrack() *midi.Track {
-	return s.TimedNotes(0).ToMidiTrack()
+// MidiTrack convert section to midi track
+func (s *Section) MidiTrack() *midi.Track {
+	return s.TimedNotes(0).MidiTrack()
 }
 
 // SequentialSection sequential sections
 type SequentialSection []*Section
 
-// ToMidiTrack to midi track
-func (ss SequentialSection) ToMidiTrack() *midi.Track {
+// MidiTrack to midi track
+func (ss SequentialSection) MidiTrack() *midi.Track {
 	stream := NewStream()
 
 	for _, section := range ss {
 		stream = stream.Append(section.Stream())
 	}
 
-	return stream.TimedNotes(0).ToMidiTrack()
+	return stream.TimedNotes(0).MidiTrack()
 }
 
 // TimedSectionEntry holds start time and section
@@ -82,8 +82,8 @@ type TimedSectionEntry struct {
 // TimedSection play timed sections
 type TimedSection []*TimedSectionEntry
 
-// ToMidiTrack timed section to single midi track
-func (ts TimedSection) ToMidiTrack() *midi.Track {
+// MidiTrack timed section to single midi track
+func (ts TimedSection) MidiTrack() *midi.Track {
 	notes := TimedNotes{}
 
 	for _, entry := range ts {
@@ -93,5 +93,5 @@ func (ts TimedSection) ToMidiTrack() *midi.Track {
 		notes = append(notes, entry.Section.TimedNotes(startTimeBeats)...)
 	}
 
-	return notes.ToMidiTrack()
+	return notes.MidiTrack()
 }

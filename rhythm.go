@@ -1,8 +1,9 @@
 package kallos
 
-// Rhythm to be able to separate rhythm from section if needed.
-// We can precalculate rhythm with a stop condition of duration and
-// feed a sequential generator with the number of steps
+// Rhythm is here to be able to separate rhythm from a section if needed.
+// We can precalculate rhythm with a stop condition and feed a sequential generator
+// with the number of steps. This way we know the rhythm before creating a section,
+// can be useful when we need to know the number of notes beforehand
 type Rhythm struct {
 	clock         float64
 	until         StopCondition

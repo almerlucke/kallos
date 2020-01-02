@@ -6,15 +6,18 @@ import (
 	"github.com/almerlucke/kallos"
 )
 
+// Probabilities represent Markov state transition probabilities
+type Probabilities []float64
+
 // MarkovState for value and next state
 type MarkovState struct {
 	Value         kallos.Generator
-	Probabilities []float64
+	Probabilities Probabilities
 	States        []*MarkovState
 }
 
 // NewMarkovState create a new markov state
-func NewMarkovState(value kallos.Generator, probabilities []float64, states []*MarkovState) *MarkovState {
+func NewMarkovState(value kallos.Generator, probabilities Probabilities, states []*MarkovState) *MarkovState {
 	return &MarkovState{
 		Value:         value,
 		Probabilities: probabilities,

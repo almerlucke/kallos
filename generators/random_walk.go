@@ -13,7 +13,7 @@ type RandomWalkMatrix interface {
 
 // RandomWalk1DMatrix for 1D matrix
 type RandomWalk1DMatrix struct {
-	Values []kallos.Value
+	Values kallos.Values
 }
 
 // ValueForIndex for 1D matrix
@@ -23,7 +23,7 @@ func (r *RandomWalk1DMatrix) ValueForIndex(index []int) kallos.Value {
 
 // RandomWalk2DMatrix for 2D matrix
 type RandomWalk2DMatrix struct {
-	Values [][]kallos.Value
+	Values []kallos.Values
 }
 
 // ValueForIndex for 2D matrix
@@ -33,7 +33,7 @@ func (r *RandomWalk2DMatrix) ValueForIndex(index []int) kallos.Value {
 
 // RandomWalk3DMatrix for 3D matrix
 type RandomWalk3DMatrix struct {
-	Values [][][]kallos.Value
+	Values [][]kallos.Values
 }
 
 // ValueForIndex for 3D matrix

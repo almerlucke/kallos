@@ -1,4 +1,4 @@
-package generators
+package tests
 
 import (
 	"log"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/almerlucke/kallos"
+	"github.com/almerlucke/kallos/generators"
 )
 
 func TestChoice(t *testing.T) {
@@ -14,7 +15,7 @@ func TestChoice(t *testing.T) {
 
 	rand.Seed(12232)
 
-	c := NewRandomChoice(kallos.ToValues(60, 61, 62, 63), false, false)
+	c := generators.NewRandomChoice(kallos.ToValues(60, 61, 62, 63), false, false)
 
 	index := 0
 	for index < 20 {

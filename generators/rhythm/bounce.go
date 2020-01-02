@@ -1,13 +1,15 @@
 package rhythm
 
 import (
-	"log"
-
 	"github.com/almerlucke/kallos"
 
 	"github.com/almerlucke/kallos/generators/tools"
 )
 
+// Bouncer represents a bouncing ball like rhythm
+// duration ramp represents the hit the ground duration,
+// pause ramp is the mid air duration
+// wait ramp is the time between a new throw
 type Bouncer struct {
 	durRamp   *tools.Ramp
 	pauseRamp *tools.Ramp
@@ -16,14 +18,16 @@ type Bouncer struct {
 	reset     bool
 }
 
-func NewBouncer(durRamp *tools.Ramp, pauseRamp *tools.Ramp, waitRamp *tools.Ramp) *Bouncer {
+// NewBouncer creates a new bouncer
+func NewBouncer(durationRamp *tools.Ramp, pauseRamp *tools.Ramp, waitRamp *tools.Ramp) *Bouncer {
 	return &Bouncer{
-		durRamp:   durRamp,
+		durRamp:   durationRamp,
 		pauseRamp: pauseRamp,
 		waitRamp:  waitRamp,
 	}
 }
 
+// GenerateValue generate a value
 func (b *Bouncer) GenerateValue() kallos.Value {
 	var k float64
 	var d bool
@@ -38,8 +42,6 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 		if !d {
 			b.waitRamp.Reset()
 		}
-
-		log.Printf("wait %v\n", k)
 
 		k = -k
 	} else {
@@ -65,14 +67,16 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 	return kallos.Value{k}
 }
 
+// IsContinuous is true
 func (b *Bouncer) IsContinuous() bool {
 	return true
 }
 
+// Done is false
 func (b *Bouncer) Done() bool {
 	return false
 }
 
+// Reset is empty
 func (b *Bouncer) Reset() {
-
 }

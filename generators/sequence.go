@@ -6,14 +6,14 @@ import (
 
 // Sequence of values
 type Sequence struct {
-	Values []kallos.Value
+	Values kallos.Values
 	index  int
 	loop   bool
 	done   bool
 }
 
 // NewSequence returns a new sequence
-func NewSequence(values []kallos.Value, loop bool) *Sequence {
+func NewSequence(values kallos.Values, loop bool) *Sequence {
 	return &Sequence{
 		Values: values,
 		index:  0,

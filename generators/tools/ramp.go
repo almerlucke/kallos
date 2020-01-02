@@ -2,6 +2,7 @@ package tools
 
 import "math"
 
+// Ramp represents a exponential ramp
 type Ramp struct {
 	min   float64
 	dev   float64
@@ -12,6 +13,7 @@ type Ramp struct {
 	inc   float64
 }
 
+// NewRamp creates a new ramp
 func NewRamp(steps int, min float64, max float64, exp float64) *Ramp {
 	return &Ramp{
 		min:   min,
@@ -22,11 +24,13 @@ func NewRamp(steps int, min float64, max float64, exp float64) *Ramp {
 	}
 }
 
+// Reset the ramp
 func (r *Ramp) Reset() {
 	r.acc = 0
 	r.index = 0
 }
 
+// Generate a value, return false if end of ramp is reached
 func (r *Ramp) Generate() (float64, bool) {
 	keepRunning := true
 

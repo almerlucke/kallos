@@ -1,4 +1,4 @@
-package generators
+package tests
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/almerlucke/kallos"
+	"github.com/almerlucke/kallos/generators"
 )
 
 func TestRandomWalk(t *testing.T) {
@@ -14,8 +15,8 @@ func TestRandomWalk(t *testing.T) {
 
 	rand.Seed(seed)
 
-	matrix := &RandomWalk2DMatrix{
-		Values: [][]kallos.Value{
+	matrix := &generators.RandomWalk2DMatrix{
+		Values: []kallos.Values{
 			kallos.ToValues(36, 38, 39, 42, 43, 44, 47),
 			kallos.ToValues(48, 50, 51, 52, 54, 55, 58),
 			kallos.ToValues(59, 60, 63, 64, 66, 65, 67),
@@ -26,7 +27,7 @@ func TestRandomWalk(t *testing.T) {
 		},
 	}
 
-	walker := NewRandomWalk([]int{7, 7}, matrix)
+	walker := generators.NewRandomWalk([]int{7, 7}, matrix)
 
 	cnt := 0
 	for cnt < 20 {
