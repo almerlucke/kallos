@@ -36,11 +36,44 @@ type Range struct {
 	High float64
 }
 
+// ToFloat converts a slice of Value's back to a float64 slice
+func (v Values) ToFloat() []float64 {
+	fls := make([]float64, len(v))
+
+	for i, e := range v {
+		fls[i] = e[0]
+	}
+
+	return fls
+}
+
 // Apply a function to all elements (and sub elements) of Values
 func (v Values) Apply(f func(float64) float64) Values {
 	for _, e := range v {
 		for i := range e {
 			e[i] = f(e[i])
+		}
+	}
+
+	return v
+}
+
+// Apply2 a function with extra float argument to all elements (and sub elements) of Values
+func (v Values) Apply2(f func(float64, float64) float64, arg float64) Values {
+	for _, e := range v {
+		for i := range e {
+			e[i] = f(e[i], arg)
+		}
+	}
+
+	return v
+}
+
+// Apply3 a function with extra float argument to all elements (and sub elements) of Values
+func (v Values) Apply3(f func(float64, float64, float64) float64, arg1 float64, arg2 float64) Values {
+	for _, e := range v {
+		for i := range e {
+			e[i] = f(e[i], arg1, arg2)
 		}
 	}
 
@@ -95,6 +128,20 @@ func (shape Shape) Lookup(index float64) float64 {
 	return v
 }
 
+// NewRange creates a new range
+func NewRange(low float64, high float64) *Range {
+	if high < low {
+		tmp := high
+		high = low
+		low = tmp
+	}
+
+	return &Range{
+		Low:  low,
+		High: high,
+	}
+}
+
 // ConvertShape convert a shape over a range
 func (r *Range) ConvertShape(shape Shape, n int) Values {
 	acc := 0.0
@@ -113,20 +160,6 @@ func (r *Range) ConvertShape(shape Shape, n int) Values {
 	return result
 }
 
-// NewRange creates a new range
-func NewRange(low float64, high float64) *Range {
-	if high < low {
-		tmp := high
-		high = low
-		low = tmp
-	}
-
-	return &Range{
-		Low:  low,
-		High: high,
-	}
-}
-
 // Clip value to low and high
 func Clip(v float64, low float64, high float64) float64 {
 	if low > high {
@@ -134,6 +167,11 @@ func Clip(v float64, low float64, high float64) float64 {
 	}
 
 	return math.Min(math.Max(float64(v), float64(low)), float64(high))
+}
+
+// Round to a quantization unit
+func Round(v float64, quantization float64) float64 {
+	return math.Round(v/quantization) * quantization
 }
 
 // ToValues convert a number of floats to a slice of Values

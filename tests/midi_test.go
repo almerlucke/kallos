@@ -167,9 +167,9 @@ func TestExportMidi(t *testing.T) {
 	s1 := &kallos.Section{}
 	s1.Clock = 0.5
 	s1.Until = kallos.NewLengthStopCondition(uint32(rhythm.NumNoteEvents()))
-	s1.Rhythm = generators.NewSequence(rhythm.Values(), true)
+	s1.Rhythm = generators.NewSequence(rhythm.Values().Apply2(kallos.Round, 0.125), true)
 	s1.Pitch = arpeggio1
-	s1.Velocity = generators.NewSequence(shape.Convert(rhythm.NumNoteEvents(), velocities), true)
+	s1.Velocity = generators.NewSequence(shape.Convert(rhythm.NumNoteEvents(), velocities).Apply(math.Round), true)
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// s2 := &kallos.Section{}
