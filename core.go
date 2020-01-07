@@ -32,79 +32,13 @@ type Range struct {
 // which can be used by a shape converter
 type Shape []float64
 
-// Mask represents an abstract field which can be used by a mask converter
+// Mask represents an abstract field which can be used to convert
 type Mask struct {
 	Low  Shape
 	High Shape
 	dif  float64
 	min  float64
 	max  float64
-}
-
-// NewMask creates a mask from two shapes
-func NewMask(l Shape, h Shape) *Mask {
-	m := &Mask{
-		Low:  l,
-		High: h,
-	}
-
-	min := 0.0
-	max := 0.0
-
-	for i, lv := range l {
-		hv := h[i]
-
-		if lv < min {
-			min = lv
-		}
-
-		if hv < min {
-			min = lv
-		}
-
-		if lv > max {
-			max = lv
-		}
-
-		if hv > max {
-			max = hv
-		}
-	}
-
-	m.min = min
-	m.max = max
-	m.dif = max - min
-
-	return m
-}
-
-// Convert mask to Values
-func (m *Mask) Convert(n int, r *Range, dist func() float64) Values {
-	acc := 0.0
-	inc := float64(len(m.Low)-1) / float64(n-1)
-	result := Values{}
-
-	for n > 0 {
-		l := (m.Low.Lookup(acc) - m.min) / m.dif
-		h := (m.High.Lookup(acc) - m.min) / m.dif
-
-		// log.Printf("l %v\n", l)
-		// log.Printf("h %v\n", h)
-
-		if l > h {
-			t := h
-			h = l
-			l = t
-		}
-
-		v := ((h-l)*dist()+l)*r.Diff + r.Low
-
-		result = append(result, Value{v})
-		acc += inc
-		n--
-	}
-
-	return result
 }
 
 // ShapeConverter converts a shape to a slice of values
@@ -230,6 +164,69 @@ func (r *Range) ConvertShape(shape Shape, n int) Values {
 
 	for n > 0 {
 		result = append(result, Value{min + shape.Lookup(acc)*dif})
+		acc += inc
+		n--
+	}
+
+	return result
+}
+
+// NewMask creates a mask from two shapes
+func NewMask(l Shape, h Shape) *Mask {
+	m := &Mask{
+		Low:  l,
+		High: h,
+	}
+
+	min := 0.0
+	max := 0.0
+
+	for i, lv := range l {
+		hv := h[i]
+
+		if lv < min {
+			min = lv
+		}
+
+		if hv < min {
+			min = lv
+		}
+
+		if lv > max {
+			max = lv
+		}
+
+		if hv > max {
+			max = hv
+		}
+	}
+
+	m.min = min
+	m.max = max
+	m.dif = max - min
+
+	return m
+}
+
+// Convert mask to Values
+func (m *Mask) Convert(n int, r *Range, dist func() float64) Values {
+	acc := 0.0
+	inc := float64(len(m.Low)-1) / float64(n-1)
+	result := Values{}
+
+	for n > 0 {
+		l := (m.Low.Lookup(acc) - m.min) / m.dif
+		h := (m.High.Lookup(acc) - m.min) / m.dif
+
+		if l > h {
+			t := h
+			h = l
+			l = t
+		}
+
+		v := ((h-l)*dist()+l)*r.Diff + r.Low
+
+		result = append(result, Value{v})
 		acc += inc
 		n--
 	}
