@@ -258,3 +258,14 @@ func ToValues(v ...float64) Values {
 
 	return vs
 }
+
+// IntToValue convert a slice of int's to a Kallos value
+func IntToValue(is []int) Value {
+	v := make(Value, len(is))
+
+	for i, ic := range v {
+		v[i] = float64(ic)
+	}
+
+	return v
+}

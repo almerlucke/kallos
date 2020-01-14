@@ -46,6 +46,48 @@ var baseNotePrefixList = []string{
 	"b",
 }
 
+type Scale struct {
+	steps   []int
+	indices []int
+}
+
+func NewScale(steps []int) *Scale {
+	indices := make([]int, len(steps))
+	index := 0
+
+	for i, s := range steps {
+		indices[i] = index
+		index += s
+	}
+
+	return &Scale{
+		steps:   steps,
+		indices: indices,
+	}
+}
+
+func (s Scale) Triad(index int, root int) []int {
+	triad := make([]int, 3)
+
+	triad[0] = root + s.indices[index]
+
+	pos := index + 2
+	if pos >= len(s.indices) {
+		triad[1] = root + s.indices[pos%len(s.indices)] + 12
+	} else {
+		triad[1] = root + s.indices[pos]
+	}
+
+	pos = index + 4
+	if pos >= len(s.indices) {
+		triad[2] = root + s.indices[pos%len(s.indices)] + 12
+	} else {
+		triad[2] = root + s.indices[pos]
+	}
+
+	return triad
+}
+
 // NoteNumberFromNoteName convert a note name to midi note number
 func NoteNumberFromNoteName(name string) (int, error) {
 	name = strings.ToLower(name)
