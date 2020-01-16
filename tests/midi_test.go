@@ -162,20 +162,18 @@ func TestExportMidi(t *testing.T) {
 	// )
 
 	// major := kallos.NewScale([]int{2, 2, 1, 2, 2, 2, 1})
-	minor := kallos.BluesScale()
-	one := minor.Triad(0).ToValue(48)
-	four := minor.Seventh(3).Invert(1).ToValue(48)
-	seven := minor.Triad(6).ToValue(48)
-	three := minor.Seventh(2).ToValue(48)
-	six := minor.Triad(5).Invert(2).ToValue(48)
-	two := minor.Seventh(1).ToValue(48)
-	five := minor.Triad(4).Invert(1).ToValue(48)
+	scale := kallos.MinorScale()
 
 	seventh := kallos.Values{
-		one, one, four, four, seven, seven, three, three, six, six, two, two, five, five,
+		scale.Triad(0).ToValue(48),
+		scale.Triad(3).ToValue(48),
+		scale.Seventh(6).ToValue(48),
+		scale.Triad(2).Invert(1).ToValue(48),
+		scale.Triad(5).ToValue(48),
+		scale.Seventh(1).ToValue(48),
+		scale.Triad(4).Invert(2).ToValue(48),
+		scale.Triad(0).ToValue(48),
 	}
-
-	t.Logf("seventh %v\n", seventh)
 
 	pitchSequence := generators.NewSequence(
 		seventh, true,
@@ -188,6 +186,14 @@ func TestExportMidi(t *testing.T) {
 	s1.Pitch = pitchSequence
 	s1.Velocity = generators.NewStaticValue(kallos.Value{100})
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
+
+	s2 := &kallos.Section{}
+	s2.Clock = 1.0
+	s2.Until = kallos.NewLengthStopCondition(56)
+	s2.Rhythm = generators.NewStaticValue(kallos.Value{0.25})
+	s2.Pitch = generators.NewRandomChoice(kallos.IntToValues(scale.FromRoot(60)...), true, true)
+	s2.Velocity = generators.NewStaticValue(kallos.Value{100})
+	s2.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// s2 := &kallos.Section{}
 	// s2.Clock = 0.5
@@ -209,6 +215,6 @@ func TestExportMidi(t *testing.T) {
 	// }
 
 	kallos.ToMidiFile("test_output.mid", []kallos.MidiTracker{
-		s1,
+		s1, s2,
 	})
 }

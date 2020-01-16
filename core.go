@@ -258,3 +258,14 @@ func ToValues(v ...float64) Values {
 
 	return vs
 }
+
+// IntToValues convert a number of ints to a slice of Values
+func IntToValues(v ...int) Values {
+	vs := make(Values, len(v))
+
+	for i, vc := range v {
+		vs[i] = Value{float64(vc)}
+	}
+
+	return vs
+}

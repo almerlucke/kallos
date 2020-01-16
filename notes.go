@@ -51,8 +51,8 @@ type Chord []int
 
 // Scale represents the steps in a note scale
 type Scale struct {
-	steps   []int
-	indices []int
+	Steps   []int
+	Indices []int
 }
 
 // NewChord creates a new chord
@@ -195,8 +195,8 @@ func NewScale(steps []int) *Scale {
 	}
 
 	return &Scale{
-		steps:   steps,
-		indices: indices,
+		Steps:   steps,
+		Indices: indices,
 	}
 }
 
@@ -210,21 +210,6 @@ func MinorScale() *Scale {
 	return NewScale([]int{2, 1, 2, 2, 2, 1, 2})
 }
 
-// MajorPentatonicScale return a major pentatonic scale
-func MajorPentatonicScale() *Scale {
-	return NewScale([]int{2, 2, 3, 2})
-}
-
-// MinorPentatonicScale return a minor pentatonic scale
-func MinorPentatonicScale() *Scale {
-	return NewScale([]int{3, 2, 2, 3})
-}
-
-// BluesScale returns a blues scale
-func BluesScale() *Scale {
-	return NewScale([]int{3, 2, 1, 1, 3, 2})
-}
-
 // SnapNote snaps a note to the scale
 func (s Scale) SnapNote(note int, direction int) int {
 	octaves := note / 12
@@ -232,7 +217,7 @@ func (s Scale) SnapNote(note int, direction int) int {
 	nearestIndex := 0
 	minDistance := 12
 
-	for _, i := range s.indices {
+	for _, i := range s.Indices {
 		distance := i - normalizedNote
 		if distance < 0 {
 			distance *= -1
@@ -258,20 +243,20 @@ func (s Scale) SnapNote(note int, direction int) int {
 func (s Scale) Triad(index int) Chord {
 	triad := NewChord(3)
 
-	triad[0] = s.indices[index]
+	triad[0] = s.Indices[index]
 
 	pos := index + 2
-	if pos >= len(s.indices) {
-		triad[1] = s.indices[pos%len(s.indices)] + 12
+	if pos >= len(s.Indices) {
+		triad[1] = s.Indices[pos%len(s.Indices)] + 12
 	} else {
-		triad[1] = s.indices[pos]
+		triad[1] = s.Indices[pos]
 	}
 
 	pos = index + 4
-	if pos >= len(s.indices) {
-		triad[2] = s.indices[pos%len(s.indices)] + 12
+	if pos >= len(s.Indices) {
+		triad[2] = s.Indices[pos%len(s.Indices)] + 12
 	} else {
-		triad[2] = s.indices[pos]
+		triad[2] = s.Indices[pos]
 	}
 
 	return triad
@@ -281,30 +266,41 @@ func (s Scale) Triad(index int) Chord {
 func (s Scale) Seventh(index int) Chord {
 	seventh := NewChord(4)
 
-	seventh[0] = s.indices[index]
+	seventh[0] = s.Indices[index]
 
 	pos := index + 2
-	if pos >= len(s.indices) {
-		seventh[1] = s.indices[pos%len(s.indices)] + 12
+	if pos >= len(s.Indices) {
+		seventh[1] = s.Indices[pos%len(s.Indices)] + 12
 	} else {
-		seventh[1] = s.indices[pos]
+		seventh[1] = s.Indices[pos]
 	}
 
 	pos = index + 4
-	if pos >= len(s.indices) {
-		seventh[2] = s.indices[pos%len(s.indices)] + 12
+	if pos >= len(s.Indices) {
+		seventh[2] = s.Indices[pos%len(s.Indices)] + 12
 	} else {
-		seventh[2] = s.indices[pos]
+		seventh[2] = s.Indices[pos]
 	}
 
 	pos = index + 6
-	if pos >= len(s.indices) {
-		seventh[3] = s.indices[pos%len(s.indices)] + 12
+	if pos >= len(s.Indices) {
+		seventh[3] = s.Indices[pos%len(s.Indices)] + 12
 	} else {
-		seventh[3] = s.indices[pos]
+		seventh[3] = s.Indices[pos]
 	}
 
 	return seventh
+}
+
+// FromRoot returns a scale offset by root
+func (s Scale) FromRoot(root int) []int {
+	notes := make([]int, len(s.Indices))
+
+	for i, n := range s.Indices {
+		notes[i] = root + n
+	}
+
+	return notes
 }
 
 // NoteByName convert a note name to midi note number
