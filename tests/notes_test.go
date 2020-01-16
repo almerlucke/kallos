@@ -8,7 +8,17 @@ import (
 
 func TestNotes(t *testing.T) {
 	major := kallos.NewScale([]int{2, 2, 1, 2, 2, 2, 1})
-	triad := major.Triad(0, 60)
 
-	t.Logf("first major triad %v\n", triad)
+	triad1 := major.Triad(1)
+	triad2 := triad1.Invert(1)
+	triad3 := triad1.Invert(2)
+	triad4 := triad1.Invert(3)
+
+	c := kallos.Chord{2, 4, 6}.SnapToScale(major, 1).Deduplicate()
+
+	t.Logf("first major triad %v\n", triad1)
+	t.Logf("invert1 triad %v\n", triad2)
+	t.Logf("invert2 triad %v\n", triad3)
+	t.Logf("invert3 triad %v\n", triad4)
+	t.Logf("snap1 %v\n", c)
 }

@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -9,8 +8,6 @@ import (
 	"github.com/almerlucke/kallos"
 
 	"github.com/almerlucke/kallos/generators"
-	"github.com/almerlucke/kallos/generators/rhythm"
-	"github.com/almerlucke/kallos/generators/tools"
 )
 
 func pitchChain1() *generators.MarkovChain {
@@ -141,35 +138,55 @@ func TestExportMidi(t *testing.T) {
 
 	//walker := generators.NewRandomWalk([]int{6, 6}, matrix)
 
-	shape := kallos.CreateShape(func(i int, n int) float64 {
-		return math.Sin(math.Pi*2*float64(i)/float64(n))*0.5 + 0.5
-	}, 128)
+	// shape := kallos.CreateShape(func(i int, n int) float64 {
+	// 	return math.Sin(math.Pi*2*float64(i)/float64(n))*0.5 + 0.5
+	// }, 128)
 
-	velocities := kallos.ToValues(30, 40, 50, 60, 70, 80, 90, 100, 110, 120)
+	// velocities := kallos.ToValues(30, 40, 50, 60, 70, 80, 90, 100, 110, 120)
 
-	note, _ := kallos.NoteNumberFromNoteName("c4")
+	// note, _ := kallos.NoteNumberFromNoteName("c4")
 
-	arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{3, 2, 1, 0, 2, 1, 0}, true)
-	// arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
+	// arpeggio1 := generators.NewArpeggio(note, []int{0, 4, 5, 9, -2, -3, -5, -7}, []int{3, 2, 1, 0, 2, 1, 0}, true)
+	// // arpeggio2 := generators.NewArpeggio(note, []int{0, -2, -3, -5, -7, 0, 2, 5, 7}, []int{2, 1, 0, 3}, true)
 
-	// pitchChain := pitchCombinedChain()
+	// // pitchChain := pitchCombinedChain()
 
-	rhythm := kallos.NewRhythm(
-		0.5,
-		kallos.NewDurationStopCondition(30.0),
-		rhythm.NewBouncer(
-			tools.NewRamp(10, 0.125, 0.5, 0.6),
-			tools.NewRamp(10, 0.125, 0.5, 0.6),
-			tools.NewRamp(6, 0.25, 1.0, 0.8),
-		),
+	// rhythm := kallos.NewRhythm(
+	// 	0.5,
+	// 	kallos.NewDurationStopCondition(30.0),
+	// 	rhythm.NewBouncer(
+	// 		tools.NewRamp(10, 0.125, 0.5, 0.6),
+	// 		tools.NewRamp(10, 0.125, 0.5, 0.6),
+	// 		tools.NewRamp(6, 0.25, 1.0, 0.8),
+	// 	),
+	// )
+
+	// major := kallos.NewScale([]int{2, 2, 1, 2, 2, 2, 1})
+	minor := kallos.BluesScale()
+	one := minor.Triad(0).ToValue(48)
+	four := minor.Seventh(3).Invert(1).ToValue(48)
+	seven := minor.Triad(6).ToValue(48)
+	three := minor.Seventh(2).ToValue(48)
+	six := minor.Triad(5).Invert(2).ToValue(48)
+	two := minor.Seventh(1).ToValue(48)
+	five := minor.Triad(4).Invert(1).ToValue(48)
+
+	seventh := kallos.Values{
+		one, one, four, four, seven, seven, three, three, six, six, two, two, five, five,
+	}
+
+	t.Logf("seventh %v\n", seventh)
+
+	pitchSequence := generators.NewSequence(
+		seventh, true,
 	)
 
 	s1 := &kallos.Section{}
-	s1.Clock = 0.5
-	s1.Until = kallos.NewLengthStopCondition(uint32(rhythm.NumNoteEvents()))
-	s1.Rhythm = generators.NewSequence(rhythm.Values().Apply2(kallos.Round, 0.125), true)
-	s1.Pitch = arpeggio1
-	s1.Velocity = generators.NewSequence(shape.Convert(velocities, rhythm.NumNoteEvents()).Apply(math.Round), true)
+	s1.Clock = 1.0
+	s1.Until = kallos.NewLengthStopCondition(28)
+	s1.Rhythm = generators.NewStaticValue(kallos.Value{0.5})
+	s1.Pitch = pitchSequence
+	s1.Velocity = generators.NewStaticValue(kallos.Value{100})
 	s1.Channel = generators.NewStaticValue(kallos.Value{1})
 
 	// s2 := &kallos.Section{}
