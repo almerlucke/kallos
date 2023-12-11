@@ -31,3 +31,6 @@ _testmain.go
 
 # Visual Studio Code
 .vscode
+
+# GoLand
+.idea/
