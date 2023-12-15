@@ -1,4 +1,4 @@
-package kallos
+package plot
 
 import (
 	"gonum.org/v1/plot"
@@ -9,20 +9,6 @@ import (
 // Plottable interface for Kallos
 type Plottable interface {
 	ToXYs() plotter.XYs
-}
-
-// ToXYs returns a plotter XY's slice
-func (vls Values) ToXYs() plotter.XYs {
-	pts := make(plotter.XYs, len(vls))
-
-	for i, v := range vls {
-		pts[i] = plotter.XY{
-			X: float64(i + 1),
-			Y: v[0],
-		}
-	}
-
-	return pts
 }
 
 // Plot values
@@ -45,6 +31,5 @@ func Plot(p Plottable, resultPath string, width int, height int) error {
 
 	pl.Add(s)
 
-	err = pl.Save(vg.Length(width), vg.Length(height), resultPath)
-	return err
+	return pl.Save(vg.Length(width), vg.Length(height), resultPath)
 }

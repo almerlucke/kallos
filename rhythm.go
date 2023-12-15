@@ -1,5 +1,16 @@
 package kallos
 
+const (
+	// TicksPerQuarterNote constant
+	TicksPerQuarterNote float64 = 192.0
+	// BPM constant
+	BPM float64 = 120.0
+	// SecondsPerBeat constant
+	SecondsPerBeat float64 = 0.5
+	// BeatsPerSecond constant
+	BeatsPerSecond float64 = 2.0
+)
+
 // Rhythm is here to be able to separate rhythm from a section if needed.
 // We can precalculate rhythm with a stop condition and feed a sequential generator
 // with the number of steps. This way we know the rhythm before creating a section,

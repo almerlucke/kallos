@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/almerlucke/kallos/plot"
 	"math"
 	"math/rand"
 	"testing"
@@ -28,7 +29,7 @@ func TestConvert(t *testing.T) {
 	cv := shape.Convert(v, 30)
 	t.Logf("values %v\n", cv)
 
-	kallos.Plot(cv, "/Users/almerlucke/Desktop/shape.png", 500, 200)
+	plot.Plot(cv, "/Users/almerlucke/Desktop/shape.png", 500, 200)
 
 	r := kallos.NewRange(3, 30)
 
@@ -43,7 +44,7 @@ func TestConvert(t *testing.T) {
 		return rand.Float64()
 	})
 
-	kallos.Plot(cv, "/Users/almerlucke/Desktop/test.png", 500, 200)
+	plot.Plot(cv, "/Users/almerlucke/Desktop/test.png", 500, 200)
 
 	t.Logf("mask %v\n", cv)
 }

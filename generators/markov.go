@@ -6,35 +6,42 @@ import (
 	"github.com/almerlucke/kallos"
 )
 
-// Probabilities represent Markov state transition probabilities
-type Probabilities []float64
-
 // MarkovState for value and next state
 type MarkovState struct {
-	Value         kallos.Generator
-	Probabilities Probabilities
-	States        []*MarkovState
+	generator      kallos.Generator
+	probabilities  []float64
+	probabilityMax float64
+	Transitions    []*MarkovState
 }
 
 // NewMarkovState create a new markov state
-func NewMarkovState(value kallos.Generator, probabilities Probabilities, states []*MarkovState) *MarkovState {
-	return &MarkovState{
-		Value:         value,
-		Probabilities: probabilities,
-		States:        states,
+func NewMarkovState(value kallos.Generator, probabilities []float64, transitions []*MarkovState) *MarkovState {
+	st := &MarkovState{
+		generator:     value,
+		probabilities: probabilities,
+		Transitions:   transitions,
 	}
+
+	pMax := 0.0
+	for _, p := range probabilities {
+		pMax += p
+	}
+
+	st.probabilityMax = pMax
+
+	return st
 }
 
 // NextState from this state
 func (s *MarkovState) NextState() *MarkovState {
-	if len(s.States) > 0 {
-		r := rand.Float64()
+	if len(s.Transitions) > 0 {
+		r := rand.Float64() * s.probabilityMax
 		pa := 0.0
 		index := 0
-		for _, p := range s.Probabilities {
+		for _, p := range s.probabilities {
 			pa += p
 			if r < pa {
-				return s.States[index]
+				return s.Transitions[index]
 			}
 			index++
 		}
@@ -64,12 +71,12 @@ func NewMarkovChain(states []*MarkovState, start *MarkovState, isContinuous bool
 
 // GenerateValue value
 func (c *MarkovChain) GenerateValue() kallos.Value {
-	v := c.Current.Value.GenerateValue()
+	v := c.Current.generator.GenerateValue()
 
-	if c.Current.Value.IsContinuous() {
+	if c.Current.generator.IsContinuous() {
 		c.Current = c.Current.NextState()
-	} else if c.Current.Value.Done() {
-		c.Current.Value.Reset()
+	} else if c.Current.generator.Done() {
+		c.Current.generator.Reset()
 		c.Current = c.Current.NextState()
 	}
 

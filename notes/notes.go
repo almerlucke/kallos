@@ -1,6 +1,7 @@
-package kallos
+package notes
 
 import (
+	"github.com/almerlucke/kallos"
 	"sort"
 	"strconv"
 	"strings"
@@ -174,8 +175,8 @@ func (c Chord) Invert(times int) Chord {
 }
 
 // ToValue converts a chord to a value and adds a root note
-func (c Chord) ToValue(root int) Value {
-	v := make(Value, len(c))
+func (c Chord) ToValue(root int) kallos.Value {
+	v := make(kallos.Value, len(c))
 
 	for i, n := range c {
 		v[i] = float64(root + n)

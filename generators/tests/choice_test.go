@@ -2,7 +2,6 @@ package tests
 
 import (
 	"log"
-	"math/rand"
 	"testing"
 
 	"github.com/almerlucke/kallos"
@@ -10,11 +9,6 @@ import (
 )
 
 func TestChoice(t *testing.T) {
-
-	// seed := time.Now().UTC().UnixNano()
-
-	rand.Seed(12232)
-
 	c := generators.NewRandomChoice(kallos.ToValues(60, 61, 62, 63), false, false)
 
 	index := 0
