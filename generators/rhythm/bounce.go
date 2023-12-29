@@ -3,7 +3,7 @@ package rhythm
 import (
 	"github.com/almerlucke/kallos"
 
-	"github.com/almerlucke/kallos/generators/tools"
+	"github.com/almerlucke/genny/floatgens/ramp"
 )
 
 // Bouncer represents a bouncing ball like rhythm
@@ -11,15 +11,15 @@ import (
 // pause ramp is the mid air duration
 // wait ramp is the time between a new throw
 type Bouncer struct {
-	durRamp   *tools.Ramp
-	pauseRamp *tools.Ramp
-	waitRamp  *tools.Ramp
+	durRamp   *ramp.Ramp
+	pauseRamp *ramp.Ramp
+	waitRamp  *ramp.Ramp
 	pause     bool
 	reset     bool
 }
 
 // NewBouncer creates a new bouncer
-func NewBouncer(durationRamp *tools.Ramp, pauseRamp *tools.Ramp, waitRamp *tools.Ramp) *Bouncer {
+func NewBouncer(durationRamp *ramp.Ramp, pauseRamp *ramp.Ramp, waitRamp *ramp.Ramp) *Bouncer {
 	return &Bouncer{
 		durRamp:   durationRamp,
 		pauseRamp: pauseRamp,
@@ -28,9 +28,8 @@ func NewBouncer(durationRamp *tools.Ramp, pauseRamp *tools.Ramp, waitRamp *tools
 }
 
 // GenerateValue generate a value
-func (b *Bouncer) GenerateValue() kallos.Value {
+func (b *Bouncer) NextValue() kallos.Value {
 	var k float64
-	var d bool
 
 	if b.reset {
 		b.pauseRamp.Reset()
@@ -38,16 +37,16 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 		b.pause = false
 		b.reset = false
 
-		k, d = b.waitRamp.Generate()
-		if !d {
+		k = b.waitRamp.NextValue()
+		if b.waitRamp.Done() {
 			b.waitRamp.Reset()
 		}
 
 		k = -k
 	} else {
 		if b.pause {
-			k, d = b.pauseRamp.Generate()
-			if d {
+			k = b.pauseRamp.NextValue()
+			if !b.pauseRamp.Done() {
 				b.pause = !b.pause
 			} else {
 				b.reset = true
@@ -55,8 +54,8 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 
 			k = -k
 		} else {
-			k, d = b.durRamp.Generate()
-			if d {
+			k = b.durRamp.NextValue()
+			if !b.durRamp.Done() {
 				b.pause = !b.pause
 			} else {
 				b.reset = true
@@ -67,8 +66,8 @@ func (b *Bouncer) GenerateValue() kallos.Value {
 	return kallos.Value{k}
 }
 
-// IsContinuous is true
-func (b *Bouncer) IsContinuous() bool {
+// Continuous is true
+func (b *Bouncer) Continuous() bool {
 	return true
 }
 

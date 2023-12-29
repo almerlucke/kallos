@@ -1,17 +1,17 @@
 package tests
 
 import (
+	"github.com/almerlucke/genny/bucket"
 	"testing"
 
 	"github.com/almerlucke/kallos"
-	"github.com/almerlucke/kallos/generators"
 )
 
 func TestRhythm(t *testing.T) {
 	rhythm := kallos.NewRhythm(
 		0.5,
 		kallos.NewDurationStopCondition(10.0),
-		generators.NewRandomChoice(kallos.ToValues(2.0, -2.0, 3.0, 1.0, -1.0), false, true),
+		bucket.NewContinuous(bucket.Indexed, 2.0, -2.0, 3.0, 1.0, -1.0),
 	)
 
 	sequence := rhythm.Values()

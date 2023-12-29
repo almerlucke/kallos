@@ -1,14 +1,12 @@
 package tests
 
 import (
-	"github.com/almerlucke/kallos/notes"
-	"math/rand"
-	"testing"
-	"time"
-
+	"github.com/almerlucke/genny/bucket"
+	"github.com/almerlucke/genny/constant"
+	"github.com/almerlucke/genny/sequence"
 	"github.com/almerlucke/kallos"
-
-	"github.com/almerlucke/kallos/generators"
+	"github.com/almerlucke/kallos/notes"
+	"testing"
 )
 
 //func pitchChain1() *generators.MarkovChain {
@@ -120,10 +118,6 @@ import (
 //}
 
 func TestExportMidi(t *testing.T) {
-	seed := time.Now().UTC().UnixNano()
-
-	rand.Seed(seed)
-
 	// streams := []*Stream{}
 
 	// matrix := &generators.RandomWalk2DMatrix{
@@ -176,25 +170,21 @@ func TestExportMidi(t *testing.T) {
 		scale.Triad(0).ToValue(48),
 	}
 
-	pitchSequence := generators.NewSequence(
-		seventh, true,
-	)
-
 	s1 := &kallos.Section{}
 	s1.Clock = 1.0
 	s1.Until = kallos.NewLengthStopCondition(28)
-	s1.Rhythm = generators.NewStaticValue(kallos.Value{0.5})
-	s1.Pitch = pitchSequence
-	s1.Velocity = generators.NewStaticValue(kallos.Value{100})
-	s1.Channel = generators.NewStaticValue(kallos.Value{1})
+	s1.Rhythm = constant.New(0.5)
+	s1.Pitch = sequence.NewContinuous[kallos.Value](seventh...)
+	s1.Velocity = constant.New(kallos.Value{100})
+	s1.Channel = constant.New(1)
 
 	s2 := &kallos.Section{}
 	s2.Clock = 1.0
 	s2.Until = kallos.NewLengthStopCondition(56)
-	s2.Rhythm = generators.NewStaticValue(kallos.Value{0.25})
-	s2.Pitch = generators.NewRandomChoice(kallos.IntToValues(scale.FromRoot(60)...), true, true)
-	s2.Velocity = generators.NewStaticValue(kallos.Value{100})
-	s2.Channel = generators.NewStaticValue(kallos.Value{1})
+	s2.Rhythm = constant.New(0.25)
+	s2.Pitch = bucket.NewContinuous[kallos.Value](bucket.Indexed, kallos.IntToValues(scale.FromRoot(60)...)...)
+	s2.Velocity = constant.New(kallos.Value{100})
+	s2.Channel = constant.New(1)
 
 	// s2 := &kallos.Section{}
 	// s2.Clock = 0.5

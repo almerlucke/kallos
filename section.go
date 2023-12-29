@@ -1,6 +1,7 @@
 package kallos
 
 import (
+	"github.com/almerlucke/genny"
 	midi "github.com/almerlucke/gomidi"
 )
 
@@ -8,10 +9,10 @@ import (
 type Section struct {
 	Clock    float64
 	Until    StopCondition
-	Rhythm   Generator
-	Pitch    Generator
-	Velocity Generator
-	Channel  Generator
+	Rhythm   genny.Generator[float64]
+	Pitch    genny.Generator[Value]
+	Velocity genny.Generator[Value]
+	Channel  genny.Generator[int]
 }
 
 // Stream creates a new stream from the section
@@ -24,16 +25,16 @@ func (s *Section) Stream() *Stream {
 	for !s.Until.ShouldStop(stream) {
 		var event StreamEvent
 
-		duration := s.Rhythm.GenerateValue()[0] * clockMultiplier
+		duration := s.Rhythm.NextValue() * clockMultiplier
 
 		if duration < 0 {
 			// Pause
 			event = NewPause(-duration)
 		} else if duration > 0 {
 			// Note
-			pitch := s.Pitch.GenerateValue()
-			velocity := s.Velocity.GenerateValue()
-			channel := int(s.Channel.GenerateValue()[0])
+			pitch := s.Pitch.NextValue()
+			velocity := s.Velocity.NextValue()
+			channel := s.Channel.NextValue()
 
 			event = NewNote(duration, pitch, velocity, channel)
 		}

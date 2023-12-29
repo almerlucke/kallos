@@ -145,17 +145,17 @@ func (s *Stream) AddEvent(event StreamEvent) {
 
 // Append a stream and return a new stream
 func (s *Stream) Append(sc *Stream) *Stream {
-	copy := NewStream()
+	cpy := NewStream()
 
 	for _, e := range s.events {
-		copy.AddEvent(e)
+		cpy.AddEvent(e)
 	}
 
 	for _, e := range sc.events {
-		copy.AddEvent(e)
+		cpy.AddEvent(e)
 	}
 
-	return copy
+	return cpy
 }
 
 // ApplyTransform to stream
@@ -182,7 +182,7 @@ func (s *Stream) ApplyTransforms(ts []Transformer) *Stream {
 
 // Sanitize the stream, combine consecutive pause events
 func (s *Stream) Sanitize() {
-	newEvents := []StreamEvent{}
+	var newEvents []StreamEvent
 
 	var previousPause *Pause
 

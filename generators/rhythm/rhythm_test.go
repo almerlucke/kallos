@@ -1,24 +1,23 @@
 package rhythm
 
 import (
+	"github.com/almerlucke/genny/floatgens/ramp"
 	"log"
 	"testing"
-
-	"github.com/almerlucke/kallos/generators/tools"
 )
 
 func TestRhythm(t *testing.T) {
 
 	r := NewBouncer(
-		tools.NewRamp(10, 0.075, 0.25, 1.4),
-		tools.NewRamp(10, 0.075, 0.25, 1.4),
-		tools.NewRamp(4, 2.0, 0.25, 1.4),
+		ramp.New(10, 0.075, 0.25, 1.4),
+		ramp.New(10, 0.075, 0.25, 1.4),
+		ramp.New(4, 2.0, 0.25, 1.4),
 	)
 
 	index := 0
 
 	for index < 50 {
-		v := r.GenerateValue()
+		v := r.NextValue()
 		log.Printf("value %v\n", v)
 		index++
 	}

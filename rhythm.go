@@ -1,5 +1,7 @@
 package kallos
 
+import "github.com/almerlucke/genny"
+
 const (
 	// TicksPerQuarterNote constant
 	TicksPerQuarterNote float64 = 192.0
@@ -18,14 +20,14 @@ const (
 type Rhythm struct {
 	clock         float64
 	until         StopCondition
-	generator     Generator
+	generator     genny.Generator[float64]
 	numNoteEvents int
 	duration      float64
 	rhythm        []float64
 }
 
 // NewRhythm initializes a new rhythm object and generates all note durations
-func NewRhythm(clock float64, until StopCondition, generator Generator) *Rhythm {
+func NewRhythm(clock float64, until StopCondition, generator genny.Generator[float64]) *Rhythm {
 	r := &Rhythm{
 		clock:     clock,
 		until:     until,
@@ -44,7 +46,7 @@ func (r *Rhythm) generate() {
 		// We have a fixed BPM of 120 (0.5 seconds per beat), calculate clock multiplier
 		clockMultiplier := r.clock * BeatsPerSecond
 
-		duration := r.generator.GenerateValue()[0] * clockMultiplier
+		duration := r.generator.NextValue() * clockMultiplier
 
 		if duration < 0 {
 			r.duration += -duration

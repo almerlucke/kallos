@@ -15,10 +15,7 @@ type Plottable interface {
 func Plot(p Plottable, resultPath string, width int, height int) error {
 	data := p.ToXYs()
 
-	pl, err := plot.New()
-	if err != nil {
-		return err
-	}
+	pl := plot.New()
 
 	pl.Add(plotter.NewGrid())
 
